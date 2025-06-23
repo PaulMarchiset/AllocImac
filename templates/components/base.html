@@ -6,9 +6,10 @@
     <title>{% block title %}AllocIMAC{% endblock %}</title>
   </head>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  {% include 'components/navbar.html' %}
 
   <body>
-    {%block content %} {% endblock %}
+    <header>{% include 'components/navbar.html' %}</header>
+    <main>{%block content %} {% endblock %}</main>
+    <footer></footer>
   </body>
 </html>
