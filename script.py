@@ -1,6 +1,6 @@
 import mysql.connector
 
-from modele import getAllStudents, getStudentById
+from modele import getAllStudents, getStudentById, oneFilm
 
 from flask import Flask, render_template, request
 
@@ -25,3 +25,11 @@ def student(id):
         return render_template("pages/student.html", student=student)
     else:
         return "Student not found", 404
+    
+@app.route("/film/<int:id>")
+def film(id):
+    film = oneFilm(id)
+    if film:
+        return render_template("pages/film.html", film=film)
+    else:
+        return "Film not found", 404
