@@ -1,0 +1,13 @@
+{% extends "components/base.html" %} {% block title %} Les étudiants {% endblock %} {%block content %}
+<h1>Liste des étudiants</h1>
+<div class="p-32 flex flex-wrap gap-4">
+  {%if students %} {% for student in students %}
+  <div class="border p-4 rounded-xl border border-black/20 w-72 h-20 flex flex-col items-center">
+    <h3 class="text-xl font-bold">{{ student.nom }}</h3>
+    <a href="/student/{{student.id}}" class="text-xs text-neutral-500">En savoir plus</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<h1>Aucun étudiant trouvé</h1>
+{% endif %} {% endblock %}

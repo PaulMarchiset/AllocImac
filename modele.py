@@ -15,8 +15,21 @@ def getAllStudents():
     return students
 
 def getStudentById(id):
-    mycursor.execute("SELECT e.nom, g.nom, f.nom FROM ETUDIANT e JOIN GENRE g ON e.id_genre = g.id JOIN FILM f ON e.id_film=f.id WHERE id = %s", (id,))
-    student = mycursor.fetchone()
-    return student
-
-# import database
+    mycursor.execute("""
+        SELECT 
+            e.nom AS etu_nom, 
+            f.nom AS film_nom, 
+            g.nom AS genre_nom 
+        FROM ETUDIANT e 
+        JOIN FILM f ON e.id_film = f.id 
+        JOIN GENRE g ON e.id_genre = g.id 
+        WHERE e.id = %s
+    """, (id,))
+    result = mycursor.fetchone()
+    if result:
+        return {
+            'nom': result['etu_nom'],
+            'film': {'nom': result['film_nom']},
+            'genre': {'nom': result['genre_nom']}
+        }
+    return None
