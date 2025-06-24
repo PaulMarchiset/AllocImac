@@ -158,50 +158,87 @@ def allGenres():
 #---------------------------------------- TOP 5 ------------------------------------------
 #-----------------------------------------------------------------------------------------
 
+
 def top5Film():
     mycursor.execute('''
-        SELECT FILM.nom AS nom_film, FILM.annee AS annee_film, REALISATEUR.nom AS realisateur, COUNT(ETUDIANT.id) AS nb_etudiants
+        SELECT 
+            FILM.id AS film_id,
+            FILM.nom AS nom_film, 
+            FILM.annee AS annee_film,
+            COUNT(ETUDIANT.id) AS nb_etudiants
         FROM FILM
         JOIN ETUDIANT ON FILM.id = ETUDIANT.id_film
-        JOIN DIRECTION ON FILM.id = DIRECTION.id_film
-        JOIN REALISATEUR ON DIRECTION.id_realisateur = REALISATEUR.id
-        GROUP BY FILM.nom, FILM.annee, REALISATEUR.nom
+        GROUP BY FILM.id
         ORDER BY nb_etudiants DESC
         LIMIT 5
     ''')
-    result = mycursor.fetchone()
-    if result:
-        return {
+    results = mycursor.fetchall()
+
+    top_films = []
+    for result in results:
+        film_id = result['film_id']
+        mycursor.execute("""
+            SELECT r.id, r.nom
+            FROM REALISATEUR r
+            JOIN DIRECTION d ON r.id = d.id_realisateur
+            WHERE d.id_film = %s
+        """, (film_id,))
+        realisateurs = [{'id': row['id'], 'nom': row['nom']} for row in mycursor.fetchall()]
+
+        top_films.append({
+            'id': film_id,
             'nom': result['nom_film'],
             'annee': result['annee_film'],
-            'realisateur': result['realisateur'],
+            'realisateurs': realisateurs,
             'nb_etudiants': result['nb_etudiants']
-        }
-    return None
+        })
+
+    return top_films
+
 
 def top5Genre():
     mycursor.execute('''
-        SELECT GENRE.nom, COUNT(ETUDIANT.id) AS nb_etudiants
+        SELECT GENRE.id AS id_genre, GENRE.nom AS nom_genre, COUNT(ETUDIANT.id) AS nb_etudiants
         FROM GENRE
-        JOIN ETUDIANT ON GENRE.id = ETUDIANT.id_genre
-        GROUP BY GENRE.nom
+        LEFT JOIN ETUDIANT ON GENRE.id = ETUDIANT.id_genre
+        GROUP BY GENRE.id, GENRE.nom
         ORDER BY nb_etudiants DESC
         LIMIT 5
     ''')
-    return mycursor.fetchall()
+    results = mycursor.fetchall()
+
+    top_genres = []
+    for result in results:
+        genre_name = result['nom_genre']
+
+        top_genres.append({
+            'id': result['id_genre'],
+            'nom': genre_name,
+            'nb_etudiants': result['nb_etudiants']
+        })
+    return top_genres
 
 def top5Realisateur():
     mycursor.execute('''
-        SELECT REALISATEUR.nom, COUNT(ETUDIANT.id) AS nb_etudiants
+        SELECT REALISATEUR.id AS id_real, REALISATEUR.nom AS nom_real, COUNT(ETUDIANT.id) AS nb_etudiants
         FROM REALISATEUR
         JOIN DIRECTION ON REALISATEUR.id = DIRECTION.id_realisateur
         JOIN FILM ON DIRECTION.id_film = FILM.id
         JOIN ETUDIANT ON FILM.id = ETUDIANT.id_film
-        GROUP BY REALISATEUR.nom
+        GROUP BY REALISATEUR.nom, REALISATEUR.id
         ORDER BY nb_etudiants DESC
         LIMIT 5
     ''')
-    return mycursor.fetchall()
+    results = mycursor.fetchall()
+
+    top_realisateurs = []
+    for result in results:
+        top_realisateurs.append({
+            'id': result['id_real'],
+            'nom': result['nom_real'],
+            'nb_etudiants': result['nb_etudiants']
+        })
+    return top_realisateurs
 
 def top5Decennies():
     mycursor.execute('''
@@ -212,4 +249,12 @@ def top5Decennies():
         ORDER BY nb_etudiants DESC
         LIMIT 5
     ''')
-    return mycursor.fetchall()
+    results = mycursor.fetchall()
+
+    top_decennies = []
+    for result in results:
+        top_decennies.append({
+            'decennie': result['decennie'],
+            'nb_etudiants': result['nb_etudiants']
+        })
+    return top_decennies

@@ -1,6 +1,6 @@
 {% extends "components/base.html" %} {% block title %} {{ film.nom }} {% endblock %} {%block content %}
 <section class="flex flex-col items-center gap-24 h-full p-32">
-  <h2 class="text-zinc-800 text-5xl font-bold">{{ film.nom }}</h2>
+  <h2 class="text-5xl font-bold">{{ film.nom }}</h2>
   <div class="flex items-center justify-center gap-24">
     <div class="rounded-xl w-auto h-auto">{% include 'components/imageNotFound.html' %}</div>
     <div class="flex flex-col items-start justify-center gap-8">
@@ -15,7 +15,7 @@
       <div class="flex flex-col items-center justify-center gap-2 border border-black/20 p-4 rounded-xl">
         <p class="text-xs text-neutral-500">Film préféré de</p>
         <h3 class="font-bold text-3xl">{{ film.nb_etudiants }}</h3>
-        <p class="text-xs text-neutral-500 capitalize">étudiants</p>
+        <p class="text-xs text-neutral-500 capitalize">étudiant{% if film.nb_etudiants > 1 %}s{% endif %}</p>
       </div>
     </div>
   </div>

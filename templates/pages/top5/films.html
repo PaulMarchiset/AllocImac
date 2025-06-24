@@ -1,14 +1,36 @@
 {% extends "components/base.html" %} {% block title %} Top 5 films {% endblock %} {%block content %}
-<section class="p-32 flex flex-col items-start gap-12">
-  <h2 class="text-3xl font-bold">Top 5 films</h2>
-  <div class="flex flex-col gap-8">
-    
-    {%if top5_films %} {% for oneFilm in top5_films %}
-    <div class="flex flex-col gap-4" id="{{ oneFilm.id }}">
-      <div class="">
-        <h3 class="text-2xl font-bold ml-3">{{ oneFilm.nom_film }}</h3>
-      </div> {% endfor %}
-  </div> {% else %}
+<section class="p-32 flex flex-col items-center gap-12">
+  <h2 class="text-3xl font-bold w-full">Top 5 films</h2>
+
+  {% if films %} {% for oneFilm in films %}
+  <a href="/film/{{ oneFilm.id }}" class="block w-full">
+    <div class="flex items-center justify-center gap-16">
+      <div class="relative">
+        <img src="../../../static/assets/images/imageNotFound.svg" class="rounded-xl" alt="" />
+        <h2 class="absolute top-0 left-0 mt-2 ml-2 w-12 h-12 text-center flex items-center justify-center bg-[#FECC00] rounded-lg font-bold text-2xl">
+          {{ loop.index }}
+        </h2>
+      </div>
+      <div class="flex flex-col items-start justify-center gap-8">
+        <div class="flex flex-col items-start justify-center gap-2">
+          <h3 class="text-2xl font-bold">{{ oneFilm.nom }}</h3>
+          <p class="w-fit">{{ oneFilm.annee }}</p>
+          <p class="w-fit text-sm text-neutral-600">De 
+            {% for real in oneFilm.realisateurs %}
+              <span class="font-semibold">{{ real.nom }}</span>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          </p>
+        </div>
+        <div class="flex flex-col items-center justify-center gap-2 border border-black/20 p-4 rounded-xl">
+          <p class="text-xs text-neutral-500">Film préféré de</p>
+          <h3 class="font-bold text-3xl">{{ oneFilm.nb_etudiants }}</h3>
+          <p class="text-xs text-neutral-500 capitalize">étudiant{% if oneFilm.nb_etudiants > 1 %}s{% endif %}</p>
+        </div>
+      </div>
+    </div>
+  </a>
+{% endfor %}
+ {% else %}
   <h1>Aucun top trouvé</h1>
   {% endif %}
 </section>

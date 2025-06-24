@@ -51,3 +51,18 @@ def genres():
 def top5_films():
     films = top5Film()
     return render_template("pages/top5/films.html", films=films)
+
+@app.route("/top5/genres")
+def top5_genres():
+    genres = top5Genre()
+    return render_template("pages/top5/genres.html", genres=genres)
+
+@app.route("/top5/directors")
+def top5_directors():
+    directors = top5Realisateur()
+    return render_template("pages/top5/directors.html", directors=directors)
+
+@app.route("/top5/decades")
+def top5_decades():
+    decades = top5Decennies()
+    return render_template("pages/top5/decades.html", decades=decades)

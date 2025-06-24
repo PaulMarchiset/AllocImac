@@ -1,0 +1,31 @@
+{% extends "components/base.html" %} {% block title %} Top 5 genres {% endblock %} {%block content %}
+<section class="p-32 flex flex-col items-center gap-12">
+  <h2 class="text-3xl font-bold w-full">Top 5 genres</h2>
+
+  {% if genres %} {% for oneGenre in genres %}
+  <a href="/genres#{{ oneGenre.id }}" class="block w-full">
+    <div class="flex items-center justify-center gap-16">
+      <div class="relative">
+        <img src="../../../static/assets/images/imageNotFound.svg" class="rounded-xl" alt="" />
+        <h2 class="absolute top-0 left-0 mt-2 ml-2 w-12 h-12 text-center flex items-center justify-center bg-[#FECC00] rounded-lg font-bold text-2xl">
+          {{ loop.index }}
+        </h2>
+      </div>
+      <div class="flex flex-col items-start justify-center gap-8">
+        <div class="flex flex-col items-start justify-center gap-2">
+          <h3 class="text-2xl font-bold">{{ oneGenre.nom }}</h3>
+        </div>
+        <div class="flex flex-col items-center justify-center gap-2 border border-black/20 p-4 rounded-xl">
+          <p class="text-xs text-neutral-500">Genre préféré de</p>
+          <h3 class="font-bold text-3xl">{{ oneGenre.nb_etudiants }}</h3>
+          <p class="text-xs text-neutral-500 capitalize">étudiant{% if oneGenre.nb_etudiants > 1 %}s{% endif %}</p>
+        </div>
+      </div>
+    </div>
+  </a>
+{% endfor %}
+ {% else %}
+  <h1>Aucun top trouvé</h1>
+  {% endif %}
+</section>
+{% endblock %}
