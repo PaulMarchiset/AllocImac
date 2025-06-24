@@ -13,9 +13,9 @@
       rel="stylesheet"
     />
   </head>
-  <body class="font-[Montserrat]">
-    <header>{% include 'components/navbar.html' %}</header>
+  <body class="font-[Montserrat] text-[#333]">
+    <header>{% include 'components/Navbar/navbar.html' %}</header>
     <main>{%block content %} {% endblock %}</main>
-    <footer></footer>
+    {% include 'components/Footer/footer.html' %}
   </body>
 </html>
