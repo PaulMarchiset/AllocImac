@@ -1,20 +1,15 @@
-{% extends "components/base.html" %} {% block title %} Tous les genres {% endblock %} {%block content %}
+{% extends "components/base.html" %} {% block title %} Top 5 films {% endblock %} {%block content %}
 <section class="p-32 flex flex-col items-start gap-12">
-  <h2 class="text-3xl font-bold">Liste des genres</h2>
+  <h2 class="text-3xl font-bold">Top 5 films</h2>
   <div class="flex flex-col gap-8">
     
-    {%if genres %} {% for oneGenre in genres %}
-    <div class="flex flex-col gap-4" id="{{ oneGenre.id }}">
-      <div class="relative yellow-bar">
-        <h3 class="text-2xl font-bold ml-3">{{ oneGenre.nom }}</h3>
-      </div>
-      {% for film in oneGenre.nom_films %}
-      <a href="film/{{ film.id }}" class="rounded-xl w-60 h-36 flex flex-col justify-end notFounded">
-        <h3 class="text-l w-full bg-black/20 rounded-b-xl px-4 py-1">{{ film.nom }}</h3>
-      </a>
-    </div>
-    {% endfor %} {% endfor %}
+    {%if top5_films %} {% for oneFilm in top5_films %}
+    <div class="flex flex-col gap-4" id="{{ oneFilm.id }}">
+      <div class="">
+        <h3 class="text-2xl font-bold ml-3">{{ oneFilm.nom_film }}</h3>
+      </div> {% endfor %}
   </div> {% else %}
-  <h1>Aucun genre trouvé</h1>
+  <h1>Aucun top trouvé</h1>
   {% endif %}
 </section>
+{% endblock %}

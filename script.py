@@ -47,7 +47,7 @@ def genres():
     genres = allGenres()
     return render_template("pages/genres.html", genres=genres)
 
-@app.route("/top5/film")
+@app.route("/top5/films")
 def top5_films():
     films = top5Film()
     return render_template("pages/top5/films.html", films=films)

@@ -160,7 +160,7 @@ def allGenres():
 
 def top5Film():
     mycursor.execute('''
-        SELECT FILM.nom, FILM.annee, REALISATEUR.nom AS realisateur, COUNT(ETUDIANT.id) AS nb_etudiants
+        SELECT FILM.nom AS nom_film, FILM.annee AS annee_film, REALISATEUR.nom AS realisateur, COUNT(ETUDIANT.id) AS nb_etudiants
         FROM FILM
         JOIN ETUDIANT ON FILM.id = ETUDIANT.id_film
         JOIN DIRECTION ON FILM.id = DIRECTION.id_film
@@ -169,7 +169,15 @@ def top5Film():
         ORDER BY nb_etudiants DESC
         LIMIT 5
     ''')
-    return mycursor.fetchall()
+    result = mycursor.fetchone()
+    if result:
+        return {
+            'nom': result['nom_film'],
+            'annee': result['annee_film'],
+            'realisateur': result['realisateur'],
+            'nb_etudiants': result['nb_etudiants']
+        }
+    return None
 
 def top5Genre():
     mycursor.execute('''
