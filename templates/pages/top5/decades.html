@@ -1,9 +1,9 @@
 {% extends "components/base.html" %} {% block title %} Top 5 décennies {% endblock %} {%block content %}
-<section class="p-32 flex flex-col items-center gap-12">
+<section class="p-32 flex flex-col items-start gap-12 relative">
   <h2 class="text-3xl font-bold w-full">Top 5 décennies</h2>
 
   {% if decades %} {% for oneDecade in decades %}
-  <div class="block w-full">
+  <div class="block w-fit relative left-[10vw]">
     <div class="flex items-center justify-center gap-16">
       <div class="relative">
         <img src="../../../static/assets/images/imageNotFound.svg" class="rounded-xl" alt="" />

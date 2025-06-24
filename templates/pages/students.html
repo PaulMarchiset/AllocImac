@@ -1,13 +1,35 @@
-{% extends "components/base.html" %} {% block title %} Les étudiants {% endblock %} {%block content %}
-<h1>Liste des étudiants</h1>
-<div class="p-32 flex flex-wrap gap-4">
-  {%if students %} {% for student in students %}
-  <div class="border p-4 rounded-xl border border-black/20 w-72 h-20 flex flex-col items-center">
-    <h3 class="text-xl font-bold">{{ student.nom }}</h3>
-    <a href="/student/{{student.id}}" class="text-xs text-neutral-500">En savoir plus</a>
+{% extends "components/base.html" %} {% block title %} Les étudiants {% endblock %} {% block content %}
+<section class="p-32 flex flex-col items-start gap-12">
+  <h2 class="text-3xl font-bold w-full">Tous les étudiants</h2>
+  <div class="flex flex-wrap gap-4">
+    {% if students %} {% set ns = namespace(current_letter='') %} {% for student in students %} {% set first_letter = student.nom[0]|upper %} {% if first_letter != ns.current_letter %} {% set
+    ns.current_letter = first_letter %}
+    <div class="w-full">
+      <div class="relative yellow-bar">
+        <h3 class="text-2xl font-bold ml-3">{{ first_letter }}</h3>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="border p-4 rounded-xl border border-black/20 w-72 h-20 flex flex-col items-center">
+      <h3 class="text-xl font-bold">{{ student.prenom }} {{ student.nom }}</h3>
+      <a href="/student/{{student.id}}" class="text-xs text-neutral-500">En savoir plus</a>
+    </div>
+    {% endfor %} {% else %}
+    <h1>Aucun étudiant trouvé</h1>
+    {% endif %}
   </div>
-  {% endfor %}
-</div>
-{% else %}
-<h1>Aucun étudiant trouvé</h1>
-{% endif %} {% endblock %}
+</section>
+<style>
+  .yellow-bar::before {
+    background: #fecc00;
+    border-radius: 0.75rem;
+    content: "";
+    overflow: hidden;
+    position: absolute;
+    width: 0.3125rem;
+    height: 1.25rem;
+    top: 0.375rem;
+  }
+</style>
+{% endblock %}

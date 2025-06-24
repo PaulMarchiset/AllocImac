@@ -1,8 +1,8 @@
-{% extends "components/base.html" %} {% block title %} {{ student.nom }} {% endblock %} {%block content %}
+{% extends "components/base.html" %} {% block title %} {{ student.prenom }} {{ student.nom }} {% endblock %} {%block content %}
 <section class="p-32 flex flex-col items-center gap-32">
   <div class="flex flex-col items-center rounded-xl justify-center h-[30vh] bg-[url('../../static/assets/images/userprofile-cover-default.webp')] bg-cover bg-center w-full">
     <img src="../../static/assets/images/empty_avatar.webp" alt="" class="w-20 h-20 rounded-full mb-4" />
-    <h2 class="text-white text-4xl font-bold">{{ student.nom }}</h2>
+    <h2 class="text-white text-4xl font-bold">{{ student.prenom }} {{ student.nom }}</h2>
   </div>
   <div class="flex flex-col items-center justify-center bg-gray-900 w-full text-white gap-6 pt-10 pb-16">
     <h2 class="text-center justify-start text-l font-semibold uppercase text-zinc-300">présentation</h2>
@@ -11,7 +11,7 @@
         <h3 class="text-3xl font-bold">{{ student.film.nom }}</h3>
         <p class="text-xs uppercase text-neutral-500">est son film préféré</p>
       </a>
-      <a href="" class="flex flex-col items-center justify-center">
+      <a href="/genres#{{student.genre.id}}" class="flex flex-col items-center justify-center">
         <h3 class="text-3xl font-bold">{{ student.genre.nom }}</h3>
         <p class="text-xs uppercase text-neutral-500">est son genre préféré</p>
       </a>

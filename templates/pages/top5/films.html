@@ -1,9 +1,8 @@
 {% extends "components/base.html" %} {% block title %} Top 5 films {% endblock %} {%block content %}
-<section class="p-32 flex flex-col items-center gap-12">
-  <h2 class="text-3xl font-bold w-full">Top 5 films</h2>
-
+<section class="p-32 flex flex-col items-start gap-12 relative">
+  <h2 class="text-3xl font-bold">Top 5 films</h2>
   {% if films %} {% for oneFilm in films %}
-  <a href="/film/{{ oneFilm.id }}" class="block w-full">
+  <a href="/film/{{ oneFilm.id }}" class="block w-fit relative left-[10vw]">
     <div class="flex items-center justify-center gap-16">
       <div class="relative">
         <img src="../../../static/assets/images/imageNotFound.svg" class="rounded-xl" alt="" />

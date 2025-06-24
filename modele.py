@@ -20,13 +20,14 @@ mycursor = mydb.cursor(dictionary=True)
 #-----------------------------------------------------------------------------------------
 
 def getAllStudents():
-    mycursor.execute("SELECT * FROM ETUDIANT")
+    mycursor.execute("SELECT * FROM ETUDIANT ORDER BY nom, prenom ASC")
     students = mycursor.fetchall()
     return students
 
 def getStudentById(id):
     mycursor.execute("""
         SELECT 
+            e.prenom AS etu_prenom,
             e.nom AS etu_nom, 
             f.nom AS film_nom,
             f.id AS film_id, 
@@ -40,6 +41,7 @@ def getStudentById(id):
     result = mycursor.fetchone()
     if result:
         return {
+            'prenom': result['etu_prenom'],
             'nom': result['etu_nom'],
             'film': {'nom': result['film_nom'],
                      'id': result['film_id']},

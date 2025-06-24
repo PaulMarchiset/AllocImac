@@ -8,12 +8,15 @@
       <div class="relative yellow-bar">
         <h3 class="text-2xl font-bold ml-3">{{ oneGenre.nom }}</h3>
       </div>
-      {% for film in oneGenre.nom_films %}
-      <a href="film/{{ film.id }}" class="rounded-xl w-60 h-36 flex flex-col justify-end notFounded">
-        <h3 class="text-l w-full bg-black/20 rounded-b-xl px-4 py-1">{{ film.nom }}</h3>
-      </a>
+      <div class="flex flex-wrap gap-4 justify-start">
+        {% for film in oneGenre.nom_films %}
+        <a href="film/{{ film.id }}" class="rounded-xl w-60 h-36 flex flex-col justify-end notFounded">
+          <h3 class="text-l w-full bg-black/20 rounded-b-xl px-4 py-1">{{ film.nom }}</h3>
+        </a>
+        {% endfor %}
+      </div>
     </div>
-    {% endfor %} {% endfor %}
+    {% endfor %}
   </div> {% else %}
   <h1>Aucun genre trouvé</h1>
   {% endif %}
