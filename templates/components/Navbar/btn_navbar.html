@@ -1,5 +1,10 @@
 {% macro btn_navbar(text,link) %}
-<li class="p-[0.625rem]">
-  <a href="{{link}}"> {{text}} </a>
+<li>
+  <a
+    href="{{link}}"
+    class="{% if request.path == link %} bg-white {% else %} hover:bg-[#fff6] {% endif %} p-[0.625rem] block round rounded-t-[0.625rem]"
+  >
+    {{text}}
+  </a>
 </li>
 {% endmacro %}

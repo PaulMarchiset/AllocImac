@@ -13,7 +13,9 @@
     />
   </head>
   <body class="font-[Montserrat] text-[#333]">
-    <header>{% include 'components/Navbar/navbar.html' %}</header>
+    <header class="sticky top-0">
+      {% include 'components/Navbar/navbar.html' %}
+    </header>
     <main>{%block content %} {% endblock %}</main>
     {% include 'components/Footer/footer.html' %}
   </body>
