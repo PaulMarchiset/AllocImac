@@ -4,21 +4,22 @@
   <div class="max-w-5xl mx-auto">
     <div class="py-[0.625rem] flex flex-row">
       <a href="/">{% include 'components/logo.html' %}</a>
-      <div class="flex flex-col">
-        <form action="" class="m-auto">
-          <input
-            type="search"
-            name="search"
-            id=""
-            class="bg-white w-[360px]"
-            placeholder="Rechercher un film, une série, une star..."
-          />
-          <input type="submit" value="" />
-        </form>
+      <form action="" class="flex-[0_1_25rem] m-auto">
+        <input
+          type="search"
+          name="search"
+          id=""
+          class="bg-white w-[360px] placeholder:font-bold text-[#737373] rounded-l-xs text-xs py-[0.625rem] px-[0.875rem]"
+          placeholder="Rechercher un film, une série, une star..."
+        />
+        <button
+          type="submit"
+          class="rounded-r-xs bg-white px-[0.75rem]"
+        ></button>
         <span class="text-[10px]">
           Ex. : Meilleurs films d'animation Disney, Meilleurs films Pixar
         </span>
-      </div>
+      </form>
     </div>
     <div
       class="flex flex-row justify-between font-bold uppercase text-sm text-zinc-800"
