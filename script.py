@@ -1,6 +1,6 @@
 import mysql.connector
 
-from modele import getAllStudents, getStudentById, oneFilm, oneDirector, allGenres, top5Decennies, top5Genre, top5Film, top5Realisateur
+from modele import getAllStudents, getStudentById, oneFilm, oneDirector, allGenres, top5Decennies, top5Genre, top5Film, top5Realisateur, search_query
 
 from flask import Flask, render_template, request
 
@@ -66,3 +66,13 @@ def top5_directors():
 def top5_decades():
     decades = top5Decennies()
     return render_template("pages/top5/decades.html", decades=decades)
+
+@app.route("/search", methods=["GET"])
+def search():
+    q = request.args.get("search", "").strip()
+    films, directors, students = [], [], []
+
+    if q:
+        films, directors, students = search_query(q)
+
+    return render_template("pages/search.html", query=q, films=films, directors=directors, students=students)

@@ -1,0 +1,50 @@
+{% extends "components/base.html" %} {% block content %}
+<section class="p-32 flex flex-col items-start gap-12 relative">
+  <h1 class="text-2xl font-bold mb-4">Résultats pour : "{{ query }}"</h1>
+
+  {% if films %}
+  <div class="flex flex-col items-start gap-4">
+      <div class="relative yellow-bar">
+            <h3 class="text-2xl font-bold ml-3">Films trouvés</h3>
+          </div>
+      <div class="flex flex-wrap gap-4">
+        {% for film in films %}
+        <div class="border p-4 rounded-xl border border-black/20 min-w-72 h-20 flex flex-col items-center">
+          <h3 class="text-xl font-bold">{{ film.nom }} ({{ film.annee }})</h3>
+          <a href="/film/{{ film.id }}" class="text-xs text-neutral-500">En savoir plus</a>
+        </div>
+        {% endfor %}
+      </div>
+  </div>
+  {% endif %} {% if directors %}
+<div class="flex flex-col items-start gap-4">
+    <div class="relative yellow-bar">
+            <h3 class="text-2xl font-bold ml-3">Réalisateurs trouvés</h3>
+          </div>  <div class="flex flex-wrap gap-4">
+        {% for director in directors %}
+        <div class="border p-4 rounded-xl border border-black/20 min-w-72 h-20 flex flex-col items-center">
+          <h3 class="text-xl font-bold">{{ director.nom }}</h3>
+          <a href="/director/{{ director.id }}" class="text-xs text-neutral-500">En savoir plus</a>
+        </div>
+        {% endfor %}
+      </div>
+</div>
+  {% endif %} {% if students %}
+  <div class="flex flex-col items-start gap-4">
+      <div class="relative yellow-bar">
+            <h3 class="text-2xl font-bold ml-3">Étudiants trouvés</h3>
+          </div>
+      <div class="flex flex-wrap gap-4">
+        {% for student in students %}
+        <div class="border p-4 rounded-xl border border-black/20 min-w-72 h-20 flex flex-col items-center">
+          <h3 class="text-xl font-bold">{{ student.prenom }} {{ student.nom }}</h3>
+          <a href="/student/{{student.id}}" class="text-xs text-neutral-500">En savoir plus</a>
+        </div>
+        {% endfor %}
+      </div>
+  </div>
+  {% endif %} {% if not films and not directors and not students %}
+  <p>Aucun résultat trouvé.</p>
+  {% endif %}
+</section>
+{% endblock %}

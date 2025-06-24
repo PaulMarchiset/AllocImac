@@ -5,19 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}AllocIMAC{% endblock %}</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="shortcut icon" href="../../static/assets/icons/iconLogo.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="../../static/assets/icons/iconLogo.svg" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
   </head>
   <body class="font-[Montserrat] text-[#333]">
-    <header class="sticky top-0 z-100">
-      {% include 'components/Navbar/navbar.html' %}
-    </header>
+    <header class="sticky top-0 z-100">{% include 'components/Navbar/navbar.html' %}</header>
     <main>{%block content %} {% endblock %}</main>
     {% include 'components/Footer/footer.html' %}
   </body>
+  <style>
+    .yellow-bar::before {
+      background: #fecc00;
+      border-radius: 0.75rem;
+      content: "";
+      overflow: hidden;
+      position: absolute;
+      width: 0.3125rem;
+      height: 1.25rem;
+      top: 0.375rem;
+    }
+  </style>
 </html>
