@@ -1,3 +1,8 @@
+#-----------------------------------------------------------------------------------------
+#----------------------------------- SETUP MYSQL -----------------------------------------
+#-----------------------------------------------------------------------------------------
+
+
 import mysql.connector
 
 mydb = mysql.connector.connect(
@@ -8,6 +13,11 @@ mydb = mysql.connector.connect(
 )
 
 mycursor = mydb.cursor(dictionary=True)
+
+
+#-----------------------------------------------------------------------------------------
+#-------------------------------------- STUDENTS -----------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def getAllStudents():
     mycursor.execute("SELECT * FROM ETUDIANT")
@@ -38,33 +48,115 @@ def getStudentById(id):
         }
     return None
 
+#-----------------------------------------------------------------------------------------
+#------------------------------------- GET FILM ------------------------------------------
+#-----------------------------------------------------------------------------------------
+
 def oneFilm(id):
+    # Main film info
     mycursor.execute("""
         SELECT 
             f.nom AS film_nom, 
-            f.annee AS film_annee, 
-            GROUP_CONCAT(DISTINCT r.nom SEPARATOR ', ') AS realisateurs,
-            GROUP_CONCAT(DISTINCT g.nom SEPARATOR ', ') AS genres,
-            COUNT(e.id) AS nb_etudiants
-        FROM FILM f 
-        JOIN DIRECTION d ON f.id = d.id_film 
-        JOIN REALISATEUR r ON d.id_realisateur = r.id 
-        JOIN APPARTENANCE a ON f.id = a.id_film
-        JOIN GENRE g ON a.id_genre = g.id
+            f.annee AS film_annee,
+            COUNT(DISTINCT e.id) AS nb_etudiants
+        FROM FILM f
         LEFT JOIN ETUDIANT e ON f.id = e.id_film
         WHERE f.id = %s
         GROUP BY f.nom, f.annee
     """, (id,))
-    result = mycursor.fetchone()
-    if result:
+    film_info = mycursor.fetchone()
+
+    # List of directors
+    mycursor.execute("""
+        SELECT r.id, r.nom
+        FROM REALISATEUR r
+        JOIN DIRECTION d ON r.id = d.id_realisateur
+        WHERE d.id_film = %s
+    """, (id,))
+    realisateurs = [{'id': row['id'], 'nom': row['nom']} for row in mycursor.fetchall()]
+
+    mycursor.execute("""
+        SELECT g.id, g.nom
+        FROM genre g
+        JOIN APPARTENANCE a ON g.id = a.id_genre
+        WHERE a.id_film = %s
+    """, (id,))
+    genres = [{'id': row['id'], 'nom': row['nom']} for row in mycursor.fetchall()]
+
+    if film_info:
         return {
-            'nom': result['film_nom'],
-            'annee': result['film_annee'],
-            'realisateurs': [name.strip() for name in result['realisateurs'].split(',')],
-            'genre': {'nom': result['genres']},
-            'nb_etudiants': result['nb_etudiants']
+            'nom': film_info['film_nom'],
+            'annee': film_info['film_annee'],
+            'realisateurs': realisateurs,
+            'genres': genres,
+            'nb_etudiants': film_info['nb_etudiants']
         }
     return None
+
+
+#-----------------------------------------------------------------------------------------
+#----------------------------------- GET DIRECTOR ----------------------------------------
+#-----------------------------------------------------------------------------------------
+
+def oneDirector(id):
+    mycursor.execute("""
+        SELECT
+            r.nom AS realisateur_nom,
+            COUNT(DISTINCT d.id_film) AS nb_films,
+            COUNT(DISTINCT a.id_genre) AS nb_genres
+        FROM REALISATEUR r
+        JOIN DIRECTION d ON r.id = d.id_realisateur
+        JOIN APPARTENANCE a ON d.id_film = a.id_film
+        WHERE r.id = %s
+        GROUP BY r.nom
+    """, (id,))
+    director_info = mycursor.fetchone()
+    if director_info:
+        return {
+            'nom': director_info['realisateur_nom'],
+            'nb_films': director_info['nb_films'],
+            'nb_genres': director_info['nb_genres']
+        }
+    return None
+
+#-----------------------------------------------------------------------------------------
+#------------------------------------- GET GENRES ----------------------------------------
+#-----------------------------------------------------------------------------------------
+
+def allGenres():
+    mycursor.execute("""
+        SELECT 
+            g.id AS genre_id,
+            g.nom AS nom_genre, 
+            f.id AS film_id, 
+            f.nom AS nom_film
+        FROM GENRE g 
+        LEFT JOIN APPARTENANCE a ON g.id = a.id_genre 
+        LEFT JOIN FILM f ON a.id_film = f.id
+        ORDER BY g.nom
+    """)
+    rows = mycursor.fetchall()
+
+    genres_dict = {}
+    for row in rows:
+        genre_id = row['genre_id']
+        if genre_id not in genres_dict:
+            genres_dict[genre_id] = {
+                'id': genre_id,
+                'nom': row['nom_genre'],
+                'nom_films': []
+            }
+        genres_dict[genre_id]['nom_films'].append({
+            'id': row['film_id'],
+            'nom': row['nom_film']
+        })
+
+    return list(genres_dict.values())
+
+
+#-----------------------------------------------------------------------------------------
+#---------------------------------------- TOP 5 ------------------------------------------
+#-----------------------------------------------------------------------------------------
 
 def top5Film():
     mycursor.execute('''

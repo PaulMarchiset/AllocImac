@@ -1,6 +1,6 @@
 import mysql.connector
 
-from modele import getAllStudents, getStudentById, oneFilm
+from modele import getAllStudents, getStudentById, oneFilm, oneDirector, allGenres, top5Decennies, top5Genre, top5Film, top5Realisateur
 
 from flask import Flask, render_template, request
 
@@ -33,3 +33,21 @@ def film(id):
         return render_template("pages/film.html", film=film)
     else:
         return "Film not found", 404
+    
+@app.route("/director/<int:id>")
+def director(id):
+    director = oneDirector(id)
+    if director:
+        return render_template("pages/director.html", director=director)
+    else:
+        return "Director not found", 404
+    
+@app.route("/genres")
+def genres():
+    genres = allGenres()
+    return render_template("pages/genres.html", genres=genres)
+
+@app.route("/top5/film")
+def top5_films():
+    films = top5Film()
+    return render_template("pages/top5/films.html", films=films)

@@ -1,12 +1,16 @@
-{% extends "components/base.html" %} {% block title %} Les étudiants {% endblock %} {%block content %}
+{% extends "components/base.html" %} {% block title %} {{ film.nom }} {% endblock %} {%block content %}
 <section class="flex flex-col items-center gap-24 h-full p-32">
   <h2 class="text-zinc-800 text-5xl font-bold">{{ film.nom }}</h2>
   <div class="flex items-center justify-center gap-24">
     <div class="rounded-xl w-auto h-auto">{% include 'components/imageNotFound.html' %}</div>
     <div class="flex flex-col items-start justify-center gap-8">
       <div class="flex flex-col items-start justify-center gap-2">
-        <p>{{ film.annee }} | <span class="font-bold">{{ film.genre.nom }}</span></p>
-        <p>De {% for real in film.realisateurs %} <span class="font-bold">{{ real }}</span>{% if not loop.last %}, {% endif %} {% endfor %}</p>
+        <p>
+          {{ film.annee }} | {% for genre in film.genres %}
+          <a href="../genres#{{ genre.id }}" class="font-bold">{{ genre.nom }}</a>{% if not loop.last %}, {% endif %} {% endfor %}
+        </p>
+
+        <p>De {% for real in film.realisateurs %} <a href="../director/{{ real.id }}" class="font-bold">{{ real.nom }}</a>{% if not loop.last %}, {% endif %} {% endfor %}</p>
       </div>
       <div class="flex flex-col items-center justify-center gap-2 border border-black/20 p-4 rounded-xl">
         <p class="text-xs text-neutral-500">Film préféré de</p>

@@ -1,0 +1,18 @@
+{% extends "components/base.html" %} {% block title %} {{ director.nom }} {% endblock %} {%block content %}
+<section class="flex flex-col items-center gap-24 h-full p-32">
+  <h2 class="text-zinc-800 text-5xl font-bold">{{ director.nom }}</h2>
+  <div class="flex items-center justify-center gap-24">
+    <div class="rounded-xl w-auto h-auto">{% include 'components/imageNotFound.html' %}</div>
+    <div class="flex flex-col items-start justify-center w-60">
+      <div class="w-full flex flex-col items-center justify-center gap-2 border border-black/20 p-4 rounded-t-xl">
+        <h3 class="font-bold text-3xl">{{ director.nb_films }}</h3>
+        <p class="text-xs text-neutral-500">{% if director.nb_films > 1 %} Films {% else %} Film {% endif %} dans la base de données  </p>
+      </div>
+      <div class="w-full flex flex-col items-center justify-center gap-2 border border-black/20 p-4 rounded-b-xl">
+        <h3 class="font-bold text-3xl">{{ director.nb_genres }}</h3>
+        <p class="text-xs text-neutral-500">{% if director.nb_genres > 1 %} Genres différents {% else %} Genre différent {% endif %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
