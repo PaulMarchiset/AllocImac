@@ -1,16 +1,59 @@
 {% import "components/Footer/title_footer.html" as ui %}
 
 <footer class="bg-[#2b2b2b] text-[#d8d8d8] max-w-full">
-  <div class="grid grid-cols-2 max-w-[61.25rem] m-auto">
-    <section>{{ ui.title_footer("Suivez-nous") }}</section>
-    <section>{{ ui.title_footer("AllocIMAC à l'étranger") }}</section>
+  <div class="grid grid-cols-2 max-w-[61.25rem] m-auto py-[0.625rem]">
+    <section>
+      {{ ui.title_footer("Suivez-nous") }}
+      <ul class="flex flex-row justify-center gap-[0.375rem]">
+        <li>
+          <a
+            href=""
+            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_Facebook.svg)] mask-cover hover:bg-blue-500"
+          >
+          </a>
+        </li>
+
+        <li>
+          <a
+            href=""
+            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_Linkedin.svg)] mask-cover hover:bg-black"
+          >
+          </a>
+        </li>
+
+        <li>
+          <a
+            href=""
+            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_insta.svg)] mask-cover hover:bg-red-500"
+          >
+          </a>
+        </li>
+      </ul>
+    </section>
+    <section>
+      {{ ui.title_footer("Menu AllocIMAC") }}
+      <ul class="w-fit m-auto text-[0.9375rem]">
+        <li><a href="" class="hover:underline">Tous les étudiants</a></li>
+        <li><a href="" class="hover:underline">Top 5 Films</a></li>
+        <li><a href="" class="hover:underline">Top 5 Genres</a></li>
+        <li><a href="" class="hover:underline">Top 5 Real</a></li>
+        <li><a href="" class="hover:underline">Top 5 Décennies</a></li>
+      </ul>
+    </section>
   </div>
-  <div class="text-xs">
-    <p></p>
+  <div class="text-xs pt-[0.625rem]">
+    <p class="text-center mb-[0.3125rem]">
+      <a href="" class="hover:underline">Portfolio Yohann Lai</a>
+      <span>|</span>
+      <a href="" class="hover:underline">Portfolio Paul Marchiset</a>
+      <span>|</span>
+      <a href="" class="hover:underline">Portfolio Lilian Peuron</a>
+    </p>
     <p class="text-center">
-      Retrouvez tous les horaires et infos de votre cinéma sur le numéro
+      Projet réalisé dans le cadre d'un exercice pédagogique à l'IMAC - numéro
       AllocIMAC :
-      <span class="text-[#fecc00] font-bold">0 892 892 892</span> (0,90€/minute)
+      <span class="text-[#fecc00] font-bold">0 893 892 891</span>
+      (15,99€/minute)
     </p>
     <p class="flex flex-row py-[0.625rem]"></p>
   </div>
