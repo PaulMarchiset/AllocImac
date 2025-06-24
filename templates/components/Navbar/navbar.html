@@ -1,3 +1,5 @@
+{% import "components/Navbar/btn_navbar.html" as ui %}
+
 <nav class="bg-[#FECC00]">
   <div class="max-w-5xl mx-auto">
     <div class="py-[0.625rem] flex flex-row">
@@ -18,14 +20,15 @@
         </span>
       </div>
     </div>
-    <div class="flex flex-row justify-between font-bold uppercase text-sm text-zinc-800">
+    <div
+      class="flex flex-row justify-between font-bold uppercase text-sm text-zinc-800"
+    >
       <ul class="flex flex-row">
-        <li class="p-[0.625rem]">Top 5 Film</li>
-        <li class="p-[0.625rem]">Top 5 Genre</li>
-        <li class="p-[0.625rem]">Top 5 Real</li>
-        <li class="p-[0.625rem]">Top 5 Décennies</li>
+        {{ ui.btn_navbar("Tous les étudiants","/students") }}
+        {{ui.btn_navbar("Top 5 Films") }} {{ ui.btn_navbar("Top 5 Genres") }} {{
+        ui.btn_navbar("Top 5 Real") }} {{ ui.btn_navbar("Top 5 Décennies")}}
       </ul>
-      <a href="" class="p-[0.5rem]">Ajouter une connerie</a>
+      <a href="" class="p-[0.5rem]">Administrateur</a>
     </div>
   </div>
 </nav>
