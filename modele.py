@@ -1,15 +1,70 @@
-# import database
-
 import mysql.connector
 
 mydb = mysql.connector.connect(
     host='localhost',
     user='root',
     password='admin',
-    database='AllocImac'
+    database='allocimac'
 )
 
 mycursor = mydb.cursor(dictionary=True)
+
+def getAllStudents():
+    mycursor.execute("SELECT * FROM ETUDIANT")
+    students = mycursor.fetchall()
+    return students
+
+def getStudentById(id):
+    mycursor.execute("""
+        SELECT 
+            e.nom AS etu_nom, 
+            f.nom AS film_nom,
+            f.id AS film_id, 
+            g.nom AS genre_nom,
+            g.id AS genre_id
+        FROM ETUDIANT e 
+        JOIN FILM f ON e.id_film = f.id 
+        JOIN GENRE g ON e.id_genre = g.id 
+        WHERE e.id = %s
+    """, (id,))
+    result = mycursor.fetchone()
+    if result:
+        return {
+            'nom': result['etu_nom'],
+            'film': {'nom': result['film_nom'],
+                     'id': result['film_id']},
+            'genre': {'nom': result['genre_nom'],
+                      'id': result['genre_id']}
+        }
+    return None
+
+def oneFilm(id):
+    mycursor.execute("""
+        SELECT 
+            f.nom AS film_nom, 
+            f.annee AS film_annee, 
+            GROUP_CONCAT(DISTINCT r.nom SEPARATOR ', ') AS realisateurs,
+            GROUP_CONCAT(DISTINCT g.nom SEPARATOR ', ') AS genres,
+            COUNT(e.id) AS nb_etudiants
+        FROM FILM f 
+        JOIN DIRECTION d ON f.id = d.id_film 
+        JOIN REALISATEUR r ON d.id_realisateur = r.id 
+        JOIN APPARTENANCE a ON f.id = a.id_film
+        JOIN GENRE g ON a.id_genre = g.id
+        LEFT JOIN ETUDIANT e ON f.id = e.id_film
+        WHERE f.id = %s
+        GROUP BY f.nom, f.annee
+    """, (id,))
+    result = mycursor.fetchone()
+    if result:
+        return {
+            'nom': result['film_nom'],
+            'annee': result['film_annee'],
+            'realisateurs': [name.strip() for name in result['realisateurs'].split(',')],
+            'genre': {'nom': result['genres']},
+            'nb_etudiants': result['nb_etudiants']
+        }
+    return None
 
 def top5Film():
     mycursor.execute('''
