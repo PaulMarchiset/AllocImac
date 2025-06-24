@@ -1,20 +1,16 @@
+{% import "components/Footer/title_footer.html" as ui %}
+
 <footer class="bg-[#2b2b2b] text-[#d8d8d8] max-w-full">
-  <div class="flex flex-row flex-wrap max-w-[61.25rem] m-auto">
-    <div>
-      <span>Suivez-nous</span>
-    </div>
-    <div>
-      <span>AllocIMAC sur mobile</span>
-    </div>
-    <div>
-      <span>AllocIMAC à l'étranger</span>
-    </div>
+  <div class="grid grid-cols-2 max-w-[61.25rem] m-auto">
+    <section>{{ ui.title_footer("Suivez-nous") }}</section>
+    <section>{{ ui.title_footer("AllocIMAC à l'étranger") }}</section>
   </div>
-  <div>
+  <div class="text-xs">
     <p></p>
-    <p>
+    <p class="text-center">
       Retrouvez tous les horaires et infos de votre cinéma sur le numéro
-      AllocIMAC : <span>0 892 892 892</span> (0,90€/minute)
+      AllocIMAC :
+      <span class="text-[#fecc00] font-bold">0 892 892 892</span> (0,90€/minute)
     </p>
     <p class="flex flex-row py-[0.625rem]"></p>
   </div>
