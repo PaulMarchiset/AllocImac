@@ -418,3 +418,10 @@ def getUserName(username):
             "genre": {"nom": result["genre_nom"], "id": result["genre_id"]},
         }
     return None
+
+
+def getUpdateInfo():
+    mycursor.execute("""SELECT nom FROM FILM""")
+    films = mycursor.fetchall()
+    mycursor.execute("""SELECT nom FROM GENRE""")
+    genres = mycursor.fetchall()

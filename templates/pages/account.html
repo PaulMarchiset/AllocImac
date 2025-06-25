@@ -7,16 +7,32 @@
   <div class="flex flex-col items-center justify-center bg-gray-900 w-full text-white gap-6 pt-10 pb-16">
     <h2 class="text-center justify-start text-l font-semibold uppercase text-zinc-300">Vous aimez</h2>
     <div class="flex items-center justify-center gap-24">
+        {% if user.film %}
       <a href="/film/{{ user.film.id }}" class="flex flex-col items-center justify-center">
         <h3 class="text-3xl font-bold">{{ user.film.nom }}</h3>
         <p class="text-xs uppercase text-neutral-500">est votre film préféré</p>
       </a>
+      {% else %}
+        <a href="#" class="flex flex-col items-center justify-center">
+            <h3 class="text-3xl font-bold">Aucun film préféré</h3>
+            <p class="text-xs uppercase text-neutral-500">Vous n'avez pas encore choisi de film préféré</p>
+    {% endif %}
+    {% if user.genre %}
       <a href="/genres#genre-{{user.genre.id}}" class="flex flex-col items-center justify-center">
         <h3 class="text-3xl font-bold">{{ user.genre.nom }}</h3>
         <p class="text-xs uppercase text-neutral-500">est votre genre préféré</p>
       </a>
+        {% else %}
+            <a href="#" class="flex flex-col items-center justify-center">
+                <h3 class="text-3xl font-bold">Aucun genre préféré</h3>
+                <p class="text-xs uppercase text-neutral-500">Vous n'avez pas encore choisi de genre préféré</p>
+            </a>
+        {% endif %}
     </div>
   </div>
-  <a href="/logout" class="px-6 py-4 bg-red-600 text-white font-bold text-l rounded-lg hover:bg-red-500">DECONNEXION</a>
+   <div class="flex gap-4">
+       <a href="/update" class="px-6 py-4 bg-blue-600 text-white font-bold text-l rounded-lg hover:bg-blue-500 uppercase">modifier</a>
+         <a href="/logout" class="px-6 py-4 bg-red-600 text-white font-bold text-l rounded-lg hover:bg-red-500 uppercase">déconnexion</a>
+   </div>
 </section>
 {% endblock %}

@@ -1,0 +1,9 @@
+{% extends "components/base.html" %} {% block title %} Modifier votre compte {% endblock %} {%block content %}
+<section class="p-32 flex flex-col items-center gap-32">
+    <h2 class="text-white text-4xl font-bold">Bonjour {{ user.prenom }} !</h2>
+    <p class="text-white text-lg">Vous pouvez modifier vos informations ci-dessous.</p>
+    <form action="/saveUpdateAccount", method="post">
+        
+    </form>
+</section>
+{% endblock %}

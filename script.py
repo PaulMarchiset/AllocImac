@@ -19,6 +19,7 @@ from modele import (
     create_user,
     verify_user,
     getUserName,
+    getUpdateInfo,
 )
 
 from flask import Flask, render_template, request
@@ -160,7 +161,6 @@ def logout():
     return index()
 
 
-
 # -----------------------------------------------------------------------------------------
 # ---------------------------------------- USER -------------------------------------------
 # -----------------------------------------------------------------------------------------
@@ -173,3 +173,11 @@ def account():
         return render_template("pages/account.html", user=user)
     else:
         return render_template("pages/login.html", message="Vous devez être connecté pour accéder à votre compte.")
+
+@app.route("/update", methods=["GET", "POST"])
+def update_account():
+    if "username" in session:
+        results = getUpdateInfo()
+        return render_template("pages/update.html", results=results)
+    else: 
+        return render_template("pages/login.html", message="Vous devez être connecté pour mettre à jour votre compte.")
