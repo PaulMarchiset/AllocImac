@@ -31,6 +31,30 @@
         Real","/top5/directors") }} {{ ui.btn_navbar("Top 5 Décennies",
         "/top5/decades") }}
       </ul>
+
+      {% if session.username %}
+      <div class="relative group">
+        <a
+          href=""
+          class="p-[0.625rem] block rounded-t-[0.625rem] hover:bg-[#fff6] font-bold uppercase text-sm"
+          >Bonjour {{session.username}} !</a
+        >
+        <div
+          class="absolute flex-col items-center gap-y-2 right-0 bg-white shadow-[0_0px_10px_rgba(0,0,0,0.25)] px-4 py-6 w-70 rounded-xl text-[0.675rem] uppercase before:content-[''] before:block before:absolute before:border-b-[0.625rem] before:border-b-white before:border-l-[0.625rem] before:border-l-transparent before:border-r-[0.625rem] before:border-r-transparent before:top-[-0.325rem] before:right-[0.875rem] z-100 group-hover:flex hidden"
+        >
+          <a
+            href="{{ url_for('login') }}"
+            class="p-[0.625rem] block border-1 w-50 hover:bg-gray-200 text-center rounded-3xl"
+            >Modifier mon profil</a
+          >
+          <a
+            href="{{ url_for('logout') }}"
+            class="p-[0.625rem] block border-1 w-50 hover:bg-gray-800 text-center rounded-3xl text-white bg-black"
+            >Se déconnecter</a
+          >
+        </div>
+      </div>
+      {% else %}
       <div class="relative group">
         <a
           href="/account"
@@ -52,6 +76,7 @@
           >
         </div>
       </div>
+      {% endif %}
     </div>
   </div>
 </nav>

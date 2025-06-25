@@ -26,7 +26,7 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-from flask import session
+from flask import session, redirect, url_for
 app.secret_key = "key"
 
 # -----------------------------------------------------------------------------------------
@@ -150,15 +150,18 @@ def login():
 
         if verify_user(username, password):
             session["username"] = username
-            return account()
+            # return account()
+            return redirect(url_for("home"))
         else:
             return render_template("pages/login.html", message="Nom d'utilisateur ou mot de passe incorrect.")
     return render_template("pages/login.html")
 
 @app.route("/logout")
 def logout():
-    session.pop("username", None)
-    return index()
+    session.clear()
+    return redirect(url_for("home"))
+    # session.pop("username", None)
+    # return index()
 
 
 # -----------------------------------------------------------------------------------------
