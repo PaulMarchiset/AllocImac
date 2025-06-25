@@ -91,6 +91,16 @@ def admin():
             nom = request.form["nom"]
             id_film = request.form["id_film"]
             id_genre = request.form["id_genre"]
+
+            mycursor.execute(
+                "SELECT COUNT(*) AS nb FROM ETUDIANT WHERE prenom=%s AND nom=%s AND id_film=%s AND id_genre=%s",
+                (prenom, nom, id_film, id_genre)
+            )
+            result = mycursor.fetchone()
+            if result["nb"] > 0:
+                flash("Un étudiant avec ce prénom, ce nom, ce film préféré et ce genre préféré existe déjà !", "error")
+                return redirect(url_for("admin", action="add_student"))
+
             mycursor.execute(
                 "INSERT INTO ETUDIANT (prenom, nom, id_film, id_genre) VALUES (%s ,%s, %s, %s)",
                 (prenom, nom, id_film, id_genre)
@@ -98,6 +108,7 @@ def admin():
             mydb.commit()
             flash("Étudiant ajouté !")
             return redirect(url_for("admin"))
+        
         # Modifier un étudiant
         if form_type == "edit_student":
             id = request.form["id"]
@@ -112,6 +123,7 @@ def admin():
             mydb.commit()
             flash("Étudiant modifié !")
             return redirect(url_for("admin"))
+        
         # Supprimer un étudiant
         if form_type == "delete_student":
             id = request.form["id"]
@@ -119,10 +131,22 @@ def admin():
             mydb.commit()
             flash("Étudiant supprimé !")
             return redirect(url_for("admin"))
+        
         # Ajouter un film
         if form_type == "add_film":
             nom = request.form["nom"]
             annee = request.form["annee"]
+
+            # Vérifier si le film existe déjà (même nom et année)
+            mycursor.execute(
+                "SELECT COUNT(*) AS nb FROM FILM WHERE LOWER(nom)=LOWER(%s) AND annee=%s",
+                (nom, annee)
+            )
+            result = mycursor.fetchone()
+            if result["nb"] > 0:
+                flash("Ce film existe déjà !", "error")
+                return redirect(url_for("admin", action="add_film"))
+    
             # Insérer le film
             mycursor.execute(
                 "INSERT INTO FILM (nom, annee) VALUES (%s, %s)",
@@ -149,9 +173,34 @@ def admin():
             mydb.commit()
             flash("Film ajouté !")
             return redirect(url_for("admin"))
+        
+        # Modifier un film
+        if form_type == "edit_film":
+            id = request.form["id"]
+            nom = request.form["nom"]
+            annee = request.form["annee"]
+            mycursor.execute(
+                "UPDATE FILM SET nom=%s, annee=%s WHERE id=%s",
+                (nom, annee, id)
+            )
+            mydb.commit()
+            flash("Film modifié !")
+            return redirect(url_for("admin"))
+        
         # Ajouter un genre
         if form_type == "add_genre":
             nom = request.form["nom"]
+
+            # Vérifier si le genre existe déjà (même nom)
+            mycursor.execute(
+                "SELECT COUNT(*) AS nb FROM GENRE WHERE LOWER(nom)=LOWER(%s)",
+                (nom,)
+            )
+            result = mycursor.fetchone()
+            if result["nb"] > 0:
+                flash("Ce genre existe déjà !", "error")
+                return redirect(url_for("admin", action="add_genre"))
+
             mycursor.execute(
                 "INSERT INTO GENRE (nom) VALUES (%s)",
                 (nom,)
@@ -159,9 +208,33 @@ def admin():
             mydb.commit()
             flash("Genre ajouté !")
             return redirect(url_for("admin"))
-        # (À compléter pour modifier/supprimer film/genre)
+        
+        # Modifier un genre
+        if form_type == "edit_genre":
+            id = request.form["id"]
+            nom = request.form["nom"]
+            mycursor.execute(
+                "UPDATE GENRE SET nom=%s WHERE id=%s",
+                (nom, id)
+            )
+            mydb.commit()
+            flash("Genre modifié !")
+            return redirect(url_for("admin"))
+
+        #Ajouter un réalisateur
         if form_type == "add_director":
             nom = request.form["nom"]
+            
+            # Vérifier si le réalisateur existe déjà (même nom)
+            mycursor.execute(
+                "SELECT COUNT(*) AS nb FROM REALISATEUR WHERE LOWER(nom)=LOWER(%s)",
+                (nom,)
+            )
+            result = mycursor.fetchone()
+            if result["nb"] > 0:
+                flash("Ce réalisateur existe déjà !", "error")
+                return redirect(url_for("admin", action="add_director"))
+            
             mycursor.execute(
                 "INSERT INTO REALISATEUR (nom) VALUES (%s)",
                 (nom,)
@@ -170,6 +243,18 @@ def admin():
             flash("Réalisateur ajouté !")
             return redirect(url_for("admin"))
         
+        # Modifier un réalisateur
+        if form_type == "edit_director":
+            id = request.form["id"]
+            nom = request.form["nom"]
+            mycursor.execute(
+                "UPDATE REALISATEUR SET nom=%s WHERE id=%s",
+                (nom, id)
+            )
+            mydb.commit()
+            flash("Réalisateur modifié !")
+            return redirect(url_for("admin"))
+            
     # Pour modification/suppression d'un étudiant
     edit_student = None
     if action in ["edit_student", "delete_student"] and edit_id:
@@ -210,12 +295,6 @@ def admin():
     mycursor.execute("SELECT id, nom FROM REALISATEUR")
     directors = mycursor.fetchall()
 
-    # Pour modification/suppression étudiant
-    edit_student = None
-    if action in ["edit_student", "delete_student"] and edit_id:
-        mycursor.execute("SELECT * FROM ETUDIANT WHERE id=%s", (edit_id,))
-        edit_student = mycursor.fetchone()
-
     return render_template(
         "pages/admin.html",
         students=students,
@@ -226,5 +305,8 @@ def admin():
         genres=genres,
         directors=directors,
         edit_id=edit_id,
-        edit_student=edit_student
+        edit_student=edit_student,
+        edit_film=edit_film,
+        edit_genre=edit_genre,
+        edit_director=edit_director
     )
