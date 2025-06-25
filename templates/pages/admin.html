@@ -35,6 +35,7 @@
       {% if action == "add_student" %}
         <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
           <input type="hidden" name="form_type" value="add_student">
+          <input name="prenom" placeholder="Prénom de l'étudiant" required class="border p-2 rounded" />
           <input name="nom" placeholder="Nom de l'étudiant" required class="border p-2 rounded" />
           <select name="id_film" required class="border p-2 rounded">
             <option value="">Film préféré</option>
@@ -85,6 +86,7 @@
         <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
           <input type="hidden" name="form_type" value="edit_student">
           <input type="hidden" name="id" value="{{ edit_student.id }}">
+          <input name="prenom" value="{{ edit_student.prenom }}" required class="border p-2 rounded" />
           <input name="nom" value="{{ edit_student.nom }}" required class="border p-2 rounded" />
           <select name="id_film" required class="border p-2 rounded">
             {% for film in films %}
@@ -102,7 +104,7 @@
         <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off" onsubmit="return confirm('Supprimer cet étudiant ?');">
           <input type="hidden" name="form_type" value="delete_student">
           <input type="hidden" name="id" value="{{ edit_student.id }}">
-          <p>Supprimer l'étudiant <strong>{{ edit_student.nom }}</strong> ?</p>
+          <p>Supprimer l'étudiant <strong>{{ edit_student.prenom }} {{ edit_student.nom }}</strong> ?</p>
           <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Confirmer la suppression</button>
         </form>
       {% elif action == "edit_student_select" %}
@@ -111,7 +113,7 @@
         <select name="id" id="student_id" class="border p-2 rounded" required>
           <option value="">-- Sélectionner --</option>
           {% for etu in students %}
-            <option value="{{ etu.id }}">{{ etu.nom }}</option>
+            <option value="{{ etu.id }}">{{ etu.prenom }} {{ etu.nom }}</option>
           {% endfor %}
         </select>
         <input type="hidden" name="action" value="edit_student">
@@ -123,7 +125,7 @@
         <select name="id" id="student_id_del" class="border p-2 rounded" required>
           <option value="">-- Sélectionner --</option>
           {% for etu in students %}
-            <option value="{{ etu.id }}">{{ etu.nom }}</option>
+            <option value="{{ etu.id }}">{{ etu.prenom }} {{ etu.nom }}</option>
           {% endfor %}
         </select>
         <input type="hidden" name="action" value="delete_student">
@@ -211,6 +213,7 @@
       <thead>
         <tr>
           <th class="py-2 px-4 border-b text-center">ID</th>
+          <th class="py-2 px-4 border-b text-center">Prénom</th>
           <th class="py-2 px-4 border-b text-center">Nom</th>
           <th class="py-2 px-4 border-b text-center">Film préféré</th>
           <th class="py-2 px-4 border-b text-center">Genre préféré</th>
@@ -221,6 +224,7 @@
         {% for etu in students %}
         <tr class="hover:bg-gray-50">
           <td class="py-2 px-4 border-b text-center">{{ etu.id }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ etu.prenom }}</td>
           <td class="py-2 px-4 border-b text-center">{{ etu.nom }}</td>
           <td class="py-2 px-4 border-b text-center">{{ etu.film_nom }}</td>
           <td class="py-2 px-4 border-b text-center">{{ etu.genre_nom }}</td>
