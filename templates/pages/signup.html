@@ -1,24 +1,61 @@
-{% extends "components/base.html" %} {% block title %} S'inscrire {% endblock %} {%block content %}
-<section class="p-32 flex flex-col items-start gap-12">
-  <h2 class="text-3xl font-bold">Créer un compte</h2>
-  <form action="/signup" method="post">
-    <div class="flex flex-col gap-4">
-      <label for="username" class="text-lg font-semibold">username</label>
-      <input type="text" id="username" name="username" required class="border border-gray-300 p-2 rounded-md w-full" />
+{% extends "components/base.html" %} {% block title %} Tous les genres {%
+endblock %} {%block content %}
+<section class="p-32 flex flex-col items-center gap-12">
+  <div class="flex flex-col items-center gap-2">
+    <h1 class="text-[1.125rem] uppercase font-semibold">
+      Inscrivez-vous en 2 secondes
+    </h1>
+    <div class="text-sm text-[#737373]">
+      Et rejoignez une communauté de 7 millions de cinéphiles.
     </div>
+  </div>
+  <form
+    action="/signup"
+    method="post"
+    class="flex flex-col gap-y-4 items-center"
+  >
+    <input
+      type="text"
+      id="username"
+      name="username"
+      required
+      class="border border-[#737373] py-4 px-3 rounded-md w-100 placeholder:uppercase"
+      placeholder="username"
+    />
 
-    <div class="flex flex-col gap-4">
-      <label for="password" class="text-lg font-semibold">Mot de passe</label>
-      <input type="password" id="password" name="password" required class="border border-gray-300 p-2 rounded-md w-full" />
-    </div>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      required
+      class="border border-[#737373] py-4 px-3 rounded-md w-100 placeholder:uppercase"
+      placeholder="password"
+    />
 
-    <div class="flex flex-col gap-4">
-      <label for="confirm-password" class="text-lg font-semibold">Confirmer le mot de passe</label>
-      <input type="password" id="confirm-password" name="confirm-password" required class="border border-gray-300 p-2 rounded-md w-full" />
-    </div>
+    <input
+      type="password"
+      id="confirm-password"
+      name="confirm-password"
+      required
+      class="border border-[#737373] py-4 px-3 rounded-md w-100 placeholder:uppercase"
+      placeholder="password confirmation"
+    />
 
-    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-200">S'inscrire</button>
+    <p class="text-[#737373] text-xs max-w-100 text-center">
+      Utilisez 8 caractères minimum (avec un chiffre, une majuscule et une
+      minuscule)
+    </p>
+
+    <button
+      type="submit"
+      class="bg-[#FECC00] hover:bg-[#e9bb01] px-6 py-3 rounded-3xl w-100 uppercase font-semibold"
+    >
+      S'inscrire
+    </button>
   </form>
   <p>{{ message }}</p>
+  <p>
+    Déjà un compte ? <a href="/login" class="text-blue-700">Connectez-vous</a>
+  </p>
 </section>
 {% endblock %}
