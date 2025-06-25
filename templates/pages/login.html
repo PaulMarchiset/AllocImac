@@ -1,0 +1,19 @@
+{% extends "components/base.html" %} {% block title %} Connexion {% endblock %} {%block content %}
+<section class="p-32 flex flex-col items-start gap-12">
+  <h2 class="text-3xl font-bold">Se connecter</h2>
+  <form action="/login" method="post">
+    <div class="flex flex-col gap-4">
+      <label for="username" class="text-lg font-semibold">username</label>
+      <input type="text" id="username" name="username" required class="border border-gray-300 p-2 rounded-md w-full" />
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <label for="password" class="text-lg font-semibold">Mot de passe</label>
+      <input type="password" id="password" name="password" required class="border border-gray-300 p-2 rounded-md w-full" />
+    </div>
+
+    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-200">Se connecter</button>
+  </form>
+  <p>{{ message }}</p>
+</section>
+{% endblock %}

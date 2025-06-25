@@ -2,6 +2,9 @@
 # ----------------------------------- SETUP MYSQL -----------------------------------------
 # -----------------------------------------------------------------------------------------
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
+import re
 
 import mysql.connector
 
@@ -300,6 +303,11 @@ def top5Decennies():
     return top_decennies
 
 
+# -----------------------------------------------------------------------------------------
+# ------------------------------------ SEARCH QUERY ---------------------------------------
+# -----------------------------------------------------------------------------------------
+
+
 def search_query(q):
     film_query = """
         SELECT * FROM FILM WHERE nom LIKE %s
@@ -319,4 +327,65 @@ def search_query(q):
     mycursor.execute(student_query, (f"%{q}%", f"%{q}%"))
     students = mycursor.fetchall()
 
-    return films, directors,  students
+    return films, directors, students
+
+
+# -----------------------------------------------------------------------------------------
+# ----------------------------------- USER MANAGEMENT -------------------------------------
+# -----------------------------------------------------------------------------------------
+
+
+def is_strong_password(password):
+    has_lower = re.search(r"[a-z]", password)
+    has_upper = re.search(r"[A-Z]", password)
+    has_digit = re.search(r"\d", password)
+    has_symbol = re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
+    return all([has_lower, has_upper, has_digit, has_symbol])
+
+
+def create_user(username, password, confirm_password):
+    username = username.strip()
+    password = password.strip()
+    confirm_password = confirm_password.strip()
+
+    if not username or not password or not confirm_password:
+        return "Username and password cannot be empty."
+
+    if password != confirm_password:
+        return "Passwords do not match."
+
+    if not is_strong_password(password):
+        return (
+            "Password must contain at least one uppercase letter, "
+            "one lowercase letter, one digit, and one special character."
+        )
+
+    try:
+        # Check if username already exists
+        mycursor.execute("SELECT 1 FROM UTILISATEUR WHERE username = %s", (username,))
+        if mycursor.fetchone():
+            return "Username already exists."
+
+        # Create user
+        hashed_pw = generate_password_hash(password)
+        mycursor.execute(
+            "INSERT INTO UTILISATEUR (username, password) VALUES (%s, %s)",
+            (username, hashed_pw),
+        )
+        mydb.commit()
+        return "User created successfully, you can now log in."
+    
+    except Exception:
+        return "An error occurred. Please try again later."
+
+
+def verify_user(username, password):
+    mycursor.execute(
+        "SELECT password FROM UTILISATEUR WHERE username = %s", (username,)
+    )
+    result = mycursor.fetchone()
+    if result:
+        hashed_pw = result["password"]
+        return check_password_hash(hashed_pw, password)
+    else:
+        return False

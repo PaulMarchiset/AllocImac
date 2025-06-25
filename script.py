@@ -1,22 +1,48 @@
+# -----------------------------------------------------------------------------------------
+# ---------------------------------------- SETUP ------------------------------------------
+# -----------------------------------------------------------------------------------------
+
+
 import mysql.connector
 
-from modele import getAllStudents, getStudentById, oneFilm, oneDirector, allGenres, top5Decennies, top5Genre, top5Film, top5Realisateur, search_query
+from modele import (
+    getAllStudents,
+    getStudentById,
+    oneFilm,
+    oneDirector,
+    allGenres,
+    top5Decennies,
+    top5Genre,
+    top5Film,
+    top5Realisateur,
+    search_query,
+    create_user,
+    verify_user,
+)
 
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
+# -----------------------------------------------------------------------------------------
+# ---------------------------------------- ROUTES -----------------------------------------
+# -----------------------------------------------------------------------------------------
+
+
 def index():
-    return render_template("index.html")
+    return render_template("pages/home.html")
+
 
 @app.route("/")
 def home():
     return render_template("pages/home.html")
 
+
 @app.route("/students")
 def students():
     students = getAllStudents()
     return render_template("pages/students.html", students=students)
+
 
 @app.route("/student/<int:id>")
 def student(id):
@@ -25,7 +51,8 @@ def student(id):
         return render_template("pages/student.html", student=student)
     else:
         return "Student not found", 404
-    
+
+
 @app.route("/film/<int:id>")
 def film(id):
     film = oneFilm(id)
@@ -33,7 +60,8 @@ def film(id):
         return render_template("pages/film.html", film=film)
     else:
         return "Film not found", 404
-    
+
+
 @app.route("/director/<int:id>")
 def director(id):
     director = oneDirector(id)
@@ -41,31 +69,45 @@ def director(id):
         return render_template("pages/director.html", director=director)
     else:
         return "Director not found", 404
-    
+
+
 @app.route("/genres")
 def genres():
     genres = allGenres()
     return render_template("pages/genres.html", genres=genres)
+
+# -----------------------------------------------------------------------------------------
+# ---------------------------------------- TOP 5 ------------------------------------------
+# -----------------------------------------------------------------------------------------
+
 
 @app.route("/top5/films")
 def top5_films():
     films = top5Film()
     return render_template("pages/top5/films.html", films=films)
 
+
 @app.route("/top5/genres")
 def top5_genres():
     genres = top5Genre()
     return render_template("pages/top5/genres.html", genres=genres)
+
 
 @app.route("/top5/directors")
 def top5_directors():
     directors = top5Realisateur()
     return render_template("pages/top5/directors.html", directors=directors)
 
+
 @app.route("/top5/decades")
 def top5_decades():
     decades = top5Decennies()
     return render_template("pages/top5/decades.html", decades=decades)
+
+
+# -----------------------------------------------------------------------------------------
+# ---------------------------------------- SEARCH ------------------------------------------
+# -----------------------------------------------------------------------------------------
 
 @app.route("/search", methods=["GET"])
 def search():
@@ -75,4 +117,36 @@ def search():
     if q:
         films, directors, students = search_query(q)
 
-    return render_template("pages/search.html", query=q, films=films, directors=directors, students=students)
+    return render_template(
+        "pages/search.html",
+        query=q,
+        films=films,
+        directors=directors,
+        students=students,
+    )
+
+# -----------------------------------------------------------------------------------------
+# ------------------------------------- AUTHENTICATION ------------------------------------
+# -----------------------------------------------------------------------------------------
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup_page():
+    if request.method == "POST":
+        result = create_user(request.form["username"], request.form["password"], request.form["confirm-password"])
+        return render_template("pages/signup.html", message=result)
+    return render_template("pages/signup.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        if verify_user(username, password):
+            return index()
+        else:
+            return render_template("pages/login.html", message="Nom d'utilisateur ou mot de passe incorrect.")
+        # result = verify_user(username, password)
+        # return render_template("pages/login.html", message=result)
+    return render_template("pages/login.html")
