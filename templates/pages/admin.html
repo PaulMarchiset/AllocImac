@@ -1,0 +1,248 @@
+{% extends "components/base.html" %} {% block title %} Page administrateur {% endblock %} {%block content %}
+<div class="container mx-auto py-8">
+  <h1 class="text-2xl font-bold mb-6">Gestion de la base de données</h1>
+
+<div class="flex flex-row gap-40 items-start mb-8">
+  <div class="flex flex-col gap-2 w-full">
+    <!-- Étudiant -->
+    <div class="flex flex-row gap-2">
+      <a href="{{ url_for('admin', action='add_student') }}" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-center min-w-max">Ajouter un étudiant</a>
+      <a href="{{ url_for('admin', action='edit_student_select') }}" class="w-full bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600 text-center min-w-max">Modifier un étudiant</a>
+      <a href="{{ url_for('admin', action='delete_student_select') }}" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-center min-w-max">Supprimer un étudiant</a>
+    </div>
+    <!-- Film -->
+    <div class="flex flex-row gap-2">
+      <a href="{{ url_for('admin', action='add_film') }}" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-center min-w-max">Ajouter un film</a>
+      <a href="{{ url_for('admin', action='edit_film_select') }}" class="w-full bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600 text-center min-w-max">Modifier un film</a>
+      <a href="{{ url_for('admin', action='delete_film_select') }}" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-center min-w-max">Supprimer un film</a>
+    </div>
+    <!-- Genre -->
+    <div class="flex flex-row gap-2">
+      <a href="{{ url_for('admin', action='add_genre') }}" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-center min-w-max">Ajouter un genre</a>
+      <a href="{{ url_for('admin', action='edit_genre_select') }}" class="w-full bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600 text-center min-w-max">Modifier un genre</a>
+      <a href="{{ url_for('admin', action='delete_genre_select') }}" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-center min-w-max">Supprimer un genre</a>
+    </div>
+    <!-- Réalisateur -->
+    <div class="flex flex-row gap-2">
+      <a href="{{ url_for('admin', action='add_director') }}" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-center min-w-max">Ajouter un réalisateur</a>
+      <a href="{{ url_for('admin', action='edit_director_select') }}" class="w-full bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600 text-center min-w-max">Modifier un réalisateur</a>
+      <a href="{{ url_for('admin', action='delete_director_select') }}" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-center min-w-max">Supprimer un réalisateur</a>
+    </div>
+  </div>
+
+    <!-- Colonne du formulaire dynamique -->
+    <div class="flex-1">
+      {% if action == "add_student" %}
+        <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
+          <input type="hidden" name="form_type" value="add_student">
+          <input name="nom" placeholder="Nom de l'étudiant" required class="border p-2 rounded" />
+          <select name="id_film" required class="border p-2 rounded">
+            <option value="">Film préféré</option>
+            {% for film in films %}
+              <option value="{{ film.id }}">{{ film.nom }}</option>
+            {% endfor %}
+          </select>
+          <select name="id_genre" required class="border p-2 rounded">
+            <option value="">Genre préféré</option>
+            {% for genre in genres %}
+              <option value="{{ genre.id }}">{{ genre.nom }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Ajouter un étudiant</button>
+        </form>
+      {% elif action == "add_film" %}
+      <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
+          <input type="hidden" name="form_type" value="add_film">
+          <input name="nom" placeholder="Nom du film" required class="border p-2 rounded" />
+          <input name="annee" placeholder="Année" type="number" required class="border p-2 rounded" />
+          <label>Genres</label>
+          <select name="genres" multiple required class="border p-2 rounded">
+          {% for genre in genres %}
+              <option value="{{ genre.id }}">{{ genre.nom }}</option>
+          {% endfor %}
+          </select>
+          <label>Réalisateurs</label>
+          <select name="directors" multiple required class="border p-2 rounded">
+          {% for director in directors %}
+              <option value="{{ director.id }}">{{ director.nom }}</option>
+          {% endfor %}
+          </select>
+          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Ajouter un film</button>
+      </form>
+      {% elif action == "add_genre" %}
+        <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
+          <input type="hidden" name="form_type" value="add_genre">
+          <input name="nom" placeholder="Nom du genre" required class="border p-2 rounded" />
+          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Ajouter un genre</button>
+        </form>
+      {% elif action == "add_director" %}
+      <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
+          <input type="hidden" name="form_type" value="add_director">
+          <input name="nom" placeholder="Nom du réalisateur" required class="border p-2 rounded" />
+          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Ajouter un réalisateur</button>
+      </form>
+      {% elif action == "edit_student" and edit_student %}
+        <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
+          <input type="hidden" name="form_type" value="edit_student">
+          <input type="hidden" name="id" value="{{ edit_student.id }}">
+          <input name="nom" value="{{ edit_student.nom }}" required class="border p-2 rounded" />
+          <select name="id_film" required class="border p-2 rounded">
+            {% for film in films %}
+              <option value="{{ film.id }}" {% if film.id == edit_student.id_film %}selected{% endif %}>{{ film.nom }}</option>
+            {% endfor %}
+          </select>
+          <select name="id_genre" required class="border p-2 rounded">
+            {% for genre in genres %}
+              <option value="{{ genre.id }}" {% if genre.id == edit_student.id_genre %}selected{% endif %}>{{ genre.nom }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded">Modifier étudiant</button>
+        </form>
+      {% elif action == "delete_student" and edit_student %}
+        <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off" onsubmit="return confirm('Supprimer cet étudiant ?');">
+          <input type="hidden" name="form_type" value="delete_student">
+          <input type="hidden" name="id" value="{{ edit_student.id }}">
+          <p>Supprimer l'étudiant <strong>{{ edit_student.nom }}</strong> ?</p>
+          <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Confirmer la suppression</button>
+        </form>
+      {% elif action == "edit_student_select" %}
+      <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+        <label for="student_id">Choisir un étudiant à modifier :</label>
+        <select name="id" id="student_id" class="border p-2 rounded" required>
+          <option value="">-- Sélectionner --</option>
+          {% for etu in students %}
+            <option value="{{ etu.id }}">{{ etu.nom }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="edit_student">
+        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier</button>
+      </form>
+    {% elif action == "delete_student_select" %}
+      <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+        <label for="student_id_del">Choisir un étudiant à supprimer :</label>
+        <select name="id" id="student_id_del" class="border p-2 rounded" required>
+          <option value="">-- Sélectionner --</option>
+          {% for etu in students %}
+            <option value="{{ etu.id }}">{{ etu.nom }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="delete_student">
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Supprimer</button>
+      </form>
+    {% elif action == "edit_film_select" %}
+      <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+        <label for="film_id">Choisir un film à modifier :</label>
+        <select name="id" id="film_id" class="border p-2 rounded" required>
+          <option value="">-- Sélectionner --</option>
+          {% for film in films %}
+            <option value="{{ film.id }}">{{ film.nom }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="edit_film">
+        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier</button>
+      </form>
+    {% elif action == "delete_film_select" %}
+      <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+        <label for="film_id_del">Choisir un film à supprimer :</label>
+        <select name="id" id="film_id_del" class="border p-2 rounded" required>
+          <option value="">-- Sélectionner --</option>
+          {% for film in films %}
+            <option value="{{ film.id }}">{{ film.nom }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="delete_film">
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Supprimer</button>
+      </form>
+    {% elif action == "edit_genre_select" %}
+      <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+        <label for="genre_id">Choisir un genre à modifier :</label>
+        <select name="id" id="genre_id" class="border p-2 rounded" required>
+          <option value="">-- Sélectionner --</option>
+          {% for genre in genres %}
+            <option value="{{ genre.id }}">{{ genre.nom }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="edit_genre">
+        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier</button>
+      </form>
+    {% elif action == "delete_genre_select" %}
+      <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+        <label for="genre_id_del">Choisir un genre à supprimer :</label>
+        <select name="id" id="genre_id_del" class="border p-2 rounded" required>
+          <option value="">-- Sélectionner --</option>
+          {% for genre in genres %}
+            <option value="{{ genre.id }}">{{ genre.nom }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="delete_genre">
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Supprimer</button>
+      </form>
+    {% elif action == "edit_director_select" %}
+      <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+        <label for="director_id">Choisir un réalisateur à modifier :</label>
+        <select name="id" id="director_id" class="border p-2 rounded" required>
+          <option value="">-- Sélectionner --</option>
+          {% for director in directors %}
+            <option value="{{ director.id }}">{{ director.nom }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="edit_director">
+        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier</button>
+      </form>
+    {% elif action == "delete_director_select" %}
+      <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+        <label for="director_id_del">Choisir un réalisateur à supprimer :</label>
+        <select name="id" id="director_id_del" class="border p-2 rounded" required>
+          <option value="">-- Sélectionner --</option>
+          {% for director in directors %}
+            <option value="{{ director.id }}">{{ director.nom }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="delete_director">
+        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Supprimer</button>
+      </form>
+          {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="px-12">
+  <table class="min-w-full bg-white border border-gray-200 mb-4 text-center">
+      <thead>
+        <tr>
+          <th class="py-2 px-4 border-b text-center">ID</th>
+          <th class="py-2 px-4 border-b text-center">Nom</th>
+          <th class="py-2 px-4 border-b text-center">Film préféré</th>
+          <th class="py-2 px-4 border-b text-center">Genre préféré</th>
+          <th class="py-2 px-4 border-b text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for etu in students %}
+        <tr class="hover:bg-gray-50">
+          <td class="py-2 px-4 border-b text-center">{{ etu.id }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ etu.nom }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ etu.film_nom }}</td>
+          <td class="py-2 px-4 border-b text-center">{{ etu.genre_nom }}</td>
+          <td class="py-2 px-4 border-b text-center">
+              <a href="{{ url_for('admin', action='edit_student', id=etu.id) }}" class="text-amber-500">Modifier</a>
+              <a href="{{ url_for('admin', action='delete_student', id=etu.id) }}" class="text-red-500 ml-2"
+                  onclick="return confirm('Supprimer cet étudiant ?');">Supprimer</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  </table>
+</div>
+
+<div class="flex justify-center gap-2">
+    {% if page > 1 %}
+      <a href="{{ url_for('admin', page=page-1) }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">&laquo; Précédent</a>
+    {% endif %}
+    <span class="px-3 py-1">{{ page }}</span>
+    {% if has_next %}
+      <a href="{{ url_for('admin', page=page+1) }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">Suivant &raquo;</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

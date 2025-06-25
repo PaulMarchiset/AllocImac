@@ -260,3 +260,18 @@ def top5Decennies():
             'nb_etudiants': result['nb_etudiants']
         })
     return top_decennies
+
+def getStudentsPaginated(offset=0, limit=10):
+    mycursor.execute("""
+        SELECT e.id, e.nom, f.nom AS film_nom, g.nom AS genre_nom
+        FROM ETUDIANT e
+        JOIN FILM f ON e.id_film = f.id
+        JOIN GENRE g ON e.id_genre = g.id
+        ORDER BY e.id
+        LIMIT %s OFFSET %s
+    """, (limit, offset))
+    return mycursor.fetchall()
+
+def countStudents():
+    mycursor.execute("SELECT COUNT(*) AS total FROM ETUDIANT")
+    return mycursor.fetchone()['total']

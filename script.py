@@ -1,8 +1,8 @@
 import mysql.connector
 
-from modele import getAllStudents, getStudentById, oneFilm, oneDirector, allGenres, top5Decennies, top5Genre, top5Film, top5Realisateur
+from modele import getAllStudents, getStudentById, oneFilm, oneDirector, allGenres, top5Decennies, top5Genre, top5Film, top5Realisateur, getStudentsPaginated, countStudents, mycursor, mydb
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
 
@@ -66,3 +66,156 @@ def top5_directors():
 def top5_decades():
     decades = top5Decennies()
     return render_template("pages/top5/decades.html", decades=decades)
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    action = request.args.get("action")
+    edit_id = request.args.get("id", type=int)
+
+    # Traitement des formulaires POST
+    if request.method == "POST":
+        form_type = request.form.get("form_type")
+        # Ajouter étudiant
+        if form_type == "add_student":
+            nom = request.form["nom"]
+            id_film = request.form["id_film"]
+            id_genre = request.form["id_genre"]
+            mycursor.execute(
+                "INSERT INTO ETUDIANT (nom, id_film, id_genre) VALUES (%s, %s, %s)",
+                (nom, id_film, id_genre)
+            )
+            mydb.commit()
+            flash("Étudiant ajouté !")
+            return redirect(url_for("admin"))
+        # Modifier étudiant
+        if form_type == "edit_student":
+            id = request.form["id"]
+            nom = request.form["nom"]
+            id_film = request.form["id_film"]
+            id_genre = request.form["id_genre"]
+            mycursor.execute(
+                "UPDATE ETUDIANT SET nom=%s, id_film=%s, id_genre=%s WHERE id=%s",
+                (nom, id_film, id_genre, id)
+            )
+            mydb.commit()
+            flash("Étudiant modifié !")
+            return redirect(url_for("admin"))
+        # Supprimer étudiant
+        if form_type == "delete_student":
+            id = request.form["id"]
+            mycursor.execute("DELETE FROM ETUDIANT WHERE id=%s", (id,))
+            mydb.commit()
+            flash("Étudiant supprimé !")
+            return redirect(url_for("admin"))
+        # Ajouter film
+        if form_type == "add_film":
+            nom = request.form["nom"]
+            annee = request.form["annee"]
+            # Insérer le film
+            mycursor.execute(
+                "INSERT INTO FILM (nom, annee) VALUES (%s, %s)",
+                (nom, annee)
+            )
+            film_id = mycursor.lastrowid
+
+            # Récupérer les genres et réalisateurs sélectionnés (listes)
+            genres_ids = request.form.getlist("genres")
+            directors_ids = request.form.getlist("directors")
+
+            # Insérer dans APPARTENANCE (film-genre)
+            for genre_id in genres_ids:
+                mycursor.execute(
+                    "INSERT INTO APPARTENANCE (id_film, id_genre) VALUES (%s, %s)",
+                    (film_id, genre_id)
+                )
+            # Insérer dans DIRECTION (film-réalisateur)
+            for director_id in directors_ids:
+                mycursor.execute(
+                    "INSERT INTO DIRECTION (id_film, id_realisateur) VALUES (%s, %s)",
+                    (film_id, director_id)
+                )
+            mydb.commit()
+            flash("Film ajouté !")
+            return redirect(url_for("admin"))
+        # Ajouter genre
+        if form_type == "add_genre":
+            nom = request.form["nom"]
+            mycursor.execute(
+                "INSERT INTO GENRE (nom) VALUES (%s)",
+                (nom,)
+            )
+            mydb.commit()
+            flash("Genre ajouté !")
+            return redirect(url_for("admin"))
+        # (À compléter pour modifier/supprimer film/genre)
+        if form_type == "add_director":
+            nom = request.form["nom"]
+            mycursor.execute(
+                "INSERT INTO REALISATEUR (nom) VALUES (%s)",
+                (nom,)
+            )
+            mydb.commit()
+            flash("Réalisateur ajouté !")
+            return redirect(url_for("admin"))
+        
+    # Pour modification/suppression étudiant
+    edit_student = None
+    if action in ["edit_student", "delete_student"] and edit_id:
+        mycursor.execute("SELECT * FROM ETUDIANT WHERE id=%s", (edit_id,))
+        edit_student = mycursor.fetchone()
+
+    # Pour modification/suppression film
+    edit_film = None
+    if action in ["edit_film", "delete_film"] and edit_id:
+        mycursor.execute("SELECT * FROM FILM WHERE id=%s", (edit_id,))
+        edit_film = mycursor.fetchone()
+
+    # Pour modification/suppression genre
+    edit_genre = None
+    if action in ["edit_genre", "delete_genre"] and edit_id:
+        mycursor.execute("SELECT * FROM GENRE WHERE id=%s", (edit_id,))
+        edit_genre = mycursor.fetchone()
+
+    # Pour modification/suppression réalisateur
+    edit_director = None
+    if action in ["edit_director", "delete_director"] and edit_id:
+        mycursor.execute("SELECT * FROM REALISATEUR WHERE id=%s", (edit_id,))
+        edit_director = mycursor.fetchone()
+
+    # Pagination
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
+    offset = (page - 1) * per_page
+    students = getStudentsPaginated(offset=offset, limit=per_page)
+    total = countStudents()
+    has_next = offset + per_page < total
+
+    # Pour les formulaires
+    mycursor.execute("SELECT id, nom FROM FILM")
+    films = mycursor.fetchall()
+    mycursor.execute("SELECT id, nom FROM GENRE")
+    genres = mycursor.fetchall()
+
+    # Pour modification/suppression étudiant
+    edit_student = None
+    if action in ["edit_student", "delete_student"] and edit_id:
+        mycursor.execute("SELECT * FROM ETUDIANT WHERE id=%s", (edit_id,))
+        edit_student = mycursor.fetchone()
+
+    mycursor.execute("SELECT id, nom FROM GENRE")
+    genres = mycursor.fetchall()
+    mycursor.execute("SELECT id, nom FROM REALISATEUR")
+    directors = mycursor.fetchall()
+
+    return render_template(
+        "pages/admin.html",
+        students=students,
+        page=page,
+        has_next=has_next,
+        action=action,
+        films=films,
+        genres=genres,
+        directors=directors,
+        edit_id=edit_id,
+        edit_student=edit_student
+    )
