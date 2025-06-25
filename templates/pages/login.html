@@ -1,19 +1,43 @@
-{% extends "components/base.html" %} {% block title %} Connexion {% endblock %} {%block content %}
-<section class="p-32 flex flex-col items-start gap-12">
-  <h2 class="text-3xl font-bold">Se connecter</h2>
-  <form action="/login" method="post">
-    <div class="flex flex-col gap-4">
-      <label for="username" class="text-lg font-semibold">username</label>
-      <input type="text" id="username" name="username" required class="border border-gray-300 p-2 rounded-md w-full" />
-    </div>
+{% extends "components/base.html" %} {% block title %} Connexion {% endblock %}
+{%block content %}
+<section class="p-32 flex flex-col items-center gap-12">
+  <h1 class="text-[1.125rem] uppercase font-semibold">Connectez-vous</h1>
+  <form
+    action="/login"
+    method="post"
+    class="flex flex-col gap-y-4 items-center"
+  >
+    <input
+      type="text"
+      id="username"
+      name="username"
+      required
+      class="border border-[#737373] py-4 px-3 rounded-md w-100 placeholder:uppercase"
+      placeholder="username"
+    />
 
-    <div class="flex flex-col gap-4">
-      <label for="password" class="text-lg font-semibold">Mot de passe</label>
-      <input type="password" id="password" name="password" required class="border border-gray-300 p-2 rounded-md w-full" />
-    </div>
-
-    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-200">Se connecter</button>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      required
+      class="border border-[#737373] py-4 px-3 rounded-md w-100 placeholder:uppercase"
+      placeholder="password"
+    />
+    <p class="text-[#737373] text-xs max-w-100 text-center">
+      Utilisez 8 caractères minimum (avec un chiffre, une majuscule et une
+      minuscule)
+    </p>
+    <button
+      type="submit"
+      class="bg-[#FECC00] hover:bg-[#e9bb01] px-6 py-3 rounded-3xl w-100 uppercase font-semibold"
+    >
+      Se connecter
+    </button>
   </form>
   <p>{{ message }}</p>
+  <p>
+    Pas de compte ? <a href="/login" class="text-blue-700">Inscrivez-vous</a>
+  </p>
 </section>
 {% endblock %}
