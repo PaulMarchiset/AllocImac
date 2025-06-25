@@ -18,11 +18,15 @@ from modele import (
     search_query,
     create_user,
     verify_user,
+    getUserName,
 )
 
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
+
+from flask import session
+app.secret_key = "key"
 
 # -----------------------------------------------------------------------------------------
 # ---------------------------------------- ROUTES -----------------------------------------
@@ -144,9 +148,28 @@ def login():
         password = request.form["password"]
 
         if verify_user(username, password):
-            return index()
+            session["username"] = username
+            return account()
         else:
             return render_template("pages/login.html", message="Nom d'utilisateur ou mot de passe incorrect.")
-        # result = verify_user(username, password)
-        # return render_template("pages/login.html", message=result)
     return render_template("pages/login.html")
+
+@app.route("/logout")
+def logout():
+    session.pop("username", None)
+    return index()
+
+
+
+# -----------------------------------------------------------------------------------------
+# ---------------------------------------- USER -------------------------------------------
+# -----------------------------------------------------------------------------------------
+
+@app.route("/account")
+def account():
+    if "username" in session:
+        username = session["username"]
+        user = getUserName(username)
+        return render_template("pages/account.html", user=user)
+    else:
+        return render_template("pages/login.html", message="Vous devez être connecté pour accéder à votre compte.")
