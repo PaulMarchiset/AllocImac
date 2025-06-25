@@ -15,6 +15,7 @@ endblock %} {%block content %}
     method="post"
     class="flex flex-col gap-y-4 items-center"
   >
+    <p class="text-red-500">{{ message }}</p>
     <input
       type="text"
       id="username"
@@ -49,12 +50,11 @@ endblock %} {%block content %}
 
     <button
       type="submit"
-      class="bg-[#FECC00] hover:bg-[#e9bb01] px-6 py-3 rounded-3xl w-100 uppercase font-semibold"
+      class="bg-[#FECC00] hover:bg-[#e9bb01] hover:cursor-pointer px-6 py-3 rounded-3xl w-100 uppercase font-semibold"
     >
       S'inscrire
     </button>
-  </form>
-  <p>{{ message }}</p>
+</form>
   <p>
     Déjà un compte ? <a href="/login" class="text-blue-700">Connectez-vous</a>
   </p>

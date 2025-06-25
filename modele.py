@@ -302,20 +302,26 @@ def top5Decennies():
         )
     return top_decennies
 
+
 def getStudentsPaginated(offset=0, limit=10):
-    mycursor.execute("""
+    mycursor.execute(
+        """
         SELECT e.id, e.prenom, e.nom, f.nom AS film_nom, g.nom AS genre_nom
         FROM ETUDIANT e
         JOIN FILM f ON e.id_film = f.id
         JOIN GENRE g ON e.id_genre = g.id
         ORDER BY e.id
         LIMIT %s OFFSET %s
-    """, (limit, offset))
+    """,
+        (limit, offset),
+    )
     return mycursor.fetchall()
+
 
 def countStudents():
     mycursor.execute("SELECT COUNT(*) AS total FROM ETUDIANT")
-    return mycursor.fetchone()['total']
+    return mycursor.fetchone()["total"]
+
 
 # -----------------------------------------------------------------------------------------
 # ------------------------------------ SEARCH QUERY ---------------------------------------
@@ -354,7 +360,8 @@ def is_strong_password(password):
     has_upper = re.search(r"[A-Z]", password)
     has_digit = re.search(r"\d", password)
     has_symbol = re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
-    return all([has_lower, has_upper, has_digit, has_symbol])
+    has_eight_chars = len(password) >= 8
+    return all([has_lower, has_upper, has_digit, has_symbol, has_eight_chars])
 
 
 def create_user(username, password, confirm_password):
@@ -370,8 +377,8 @@ def create_user(username, password, confirm_password):
 
     if not is_strong_password(password):
         return (
-            "Password must contain at least one uppercase letter, "
-            "one lowercase letter, one digit, and one special character."
+            "Le mot de passe doit contenir au moins 8 caractères, "
+            "une majuscule, une minuscule, un chiffre et un symbole."
         )
 
     try:
@@ -387,7 +394,7 @@ def create_user(username, password, confirm_password):
             (username, hashed_pw),
         )
         mydb.commit()
-        return "User created successfully, you can now log in."
+        return "success"
 
     except Exception:
         return "An error occurred. Please try again later."
@@ -444,15 +451,24 @@ def getUpdateInfo():
         "genres": [{"id": genre["id"], "nom": genre["nom"]} for genre in genres],
     }
 
+
 def saveUpdateInfo(username, prenom, nom, id_film, id_genre):
-    mycursor.execute("""SELECT id_etudiant FROM UTILISATEUR WHERE username = %s""", (username,))
+    mycursor.execute(
+        """SELECT id_etudiant FROM UTILISATEUR WHERE username = %s""", (username,)
+    )
     user = mycursor.fetchone()
-    if not user or user["id_etudiant"] is None: 
-        mycursor.execute("""INSERT INTO ETUDIANT (prenom, nom, id_film, id_genre) VALUES (%s, %s, %s, %s)""", (prenom, nom, id_film, id_genre))
+    if not user or user["id_etudiant"] is None:
+        mycursor.execute(
+            """INSERT INTO ETUDIANT (prenom, nom, id_film, id_genre) VALUES (%s, %s, %s, %s)""",
+            (prenom, nom, id_film, id_genre),
+        )
         mydb.commit()
         mycursor.execute("""SELECT LAST_INSERT_ID()""")
         etudiant_id = mycursor.fetchone()["LAST_INSERT_ID()"]
-        mycursor.execute("""UPDATE UTILISATEUR SET id_etudiant = %s WHERE username = %s""", (etudiant_id, username))
+        mycursor.execute(
+            """UPDATE UTILISATEUR SET id_etudiant = %s WHERE username = %s""",
+            (etudiant_id, username),
+        )
     else:
         etudiant_id = user["id_etudiant"]
         mycursor.execute(
@@ -460,3 +476,23 @@ def saveUpdateInfo(username, prenom, nom, id_film, id_genre):
             (prenom, nom, id_film, id_genre, etudiant_id),
         )
     mydb.commit()
+
+
+def getStudentsPaginated(offset=0, limit=10):
+    mycursor.execute(
+        """
+        SELECT e.id, e.prenom, e.nom, f.nom AS film_nom, g.nom AS genre_nom
+        FROM ETUDIANT e
+        JOIN FILM f ON e.id_film = f.id
+        JOIN GENRE g ON e.id_genre = g.id
+        ORDER BY e.id
+        LIMIT %s OFFSET %s
+    """,
+        (limit, offset),
+    )
+    return mycursor.fetchall()
+
+
+def countStudents():
+    mycursor.execute("SELECT COUNT(*) AS total FROM ETUDIANT")
+    return mycursor.fetchone()["total"]

@@ -8,6 +8,7 @@
     method="post"
     class="flex flex-col gap-y-4 items-center"
   >
+  <p class="text-red-500">{{ message }}</p>
     <input
       type="text"
       id="username"
@@ -31,14 +32,13 @@
     </p>
     <button
       type="submit"
-      class="bg-[#FECC00] hover:bg-[#e9bb01] px-6 py-3 rounded-3xl w-100 uppercase font-semibold"
+      class="bg-[#FECC00] hover:bg-[#e9bb01] hover:cursor-pointer px-6 py-3 rounded-3xl w-100 uppercase font-semibold"
     >
       Se connecter
     </button>
   </form>
-  <p>{{ message }}</p>
   <p>
-    Pas de compte ? <a href="/login" class="text-blue-700">Inscrivez-vous</a>
+    Pas de compte ? <a href="/signup" class="text-blue-700">Inscrivez-vous</a>
   </p>
 </section>
 {% endblock %}

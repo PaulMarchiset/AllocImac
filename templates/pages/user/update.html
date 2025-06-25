@@ -1,0 +1,40 @@
+{% extends "components/base.html" %} {% block title %} Modifier votre compte {% endblock %} {%block content %}
+<section class="p-32 flex flex-col items-center gap-32">
+  <div class="flex flex-col items-center gap-4">
+    <h2 class="text-black text-4xl font-bold">Bonjour {{ user.prenom }} !</h2>
+    <p class="text-black text-lg">Vous pouvez modifier vos informations ci-dessous.</p>
+  </div>
+  <form action="/saveUpdateAccount" method="post" class="flex flex-col gap-6 w-1/2">
+    <label class="flex flex-col text-black font-semibold">
+      Prénom:
+      <input type="text" name="prenom" value="{{ user.prenom }}" class="p-2 rounded" required />
+    </label>
+
+    <label class="flex flex-col text-black font-semibold">
+      Nom:
+      <input type="text" name="nom" value="{{ user.nom }}" class="p-2 rounded" required />
+    </label>
+
+    <select name="film" required>
+  {% for film in update.films %}
+    <option value="{{ film.id }}"
+      {% if user.film and film.id == user.film.id %}selected{% endif %}>
+      {{ film.nom }}
+    </option>
+  {% endfor %}
+</select>
+
+<select name="genre" required>
+  {% for genre in update.genres %}
+    <option value="{{ genre.id }}"
+      {% if user.genre and genre.id == user.genre.id %}selected{% endif %}>
+      {{ genre.nom }}
+    </option>
+  {% endfor %}
+</select>
+
+
+    <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-500">Enregistrer</button>
+  </form>
+</section>
+{% endblock %}
