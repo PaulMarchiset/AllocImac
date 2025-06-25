@@ -1,6 +1,7 @@
 {% extends "components/base.html" %} {% block title %} Connexion {% endblock %}
 {%block content %}
-<section class="p-32 flex flex-col items-center gap-12">
+<section class="p-32 flex flex-col items-center gap-10">
+  {% include 'components/logo_yellow.html' %}
   <h1 class="text-[1.125rem] uppercase font-semibold">Connectez-vous</h1>
   <form
     action="/login"
