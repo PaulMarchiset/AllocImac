@@ -18,8 +18,9 @@ from modele import (
     search_query,
     create_user,
     verify_user,
-    getUserName,
+    getUserInfo,
     getUpdateInfo,
+    saveUpdateInfo,
 )
 
 from flask import Flask, render_template, request
@@ -27,6 +28,7 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 
 from flask import session
+
 app.secret_key = "key"
 
 # -----------------------------------------------------------------------------------------
@@ -81,6 +83,7 @@ def genres():
     genres = allGenres()
     return render_template("pages/genres.html", genres=genres)
 
+
 # -----------------------------------------------------------------------------------------
 # ---------------------------------------- TOP 5 ------------------------------------------
 # -----------------------------------------------------------------------------------------
@@ -114,6 +117,7 @@ def top5_decades():
 # ---------------------------------------- SEARCH ------------------------------------------
 # -----------------------------------------------------------------------------------------
 
+
 @app.route("/search", methods=["GET"])
 def search():
     q = request.args.get("search", "").strip()
@@ -130,14 +134,20 @@ def search():
         students=students,
     )
 
+
 # -----------------------------------------------------------------------------------------
 # ------------------------------------- AUTHENTICATION ------------------------------------
 # -----------------------------------------------------------------------------------------
 
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup_page():
     if request.method == "POST":
-        result = create_user(request.form["username"], request.form["password"], request.form["confirm-password"])
+        result = create_user(
+            request.form["username"],
+            request.form["password"],
+            request.form["confirm-password"],
+        )
         return render_template("pages/signup.html", message=result)
     return render_template("pages/signup.html")
 
@@ -152,8 +162,12 @@ def login():
             session["username"] = username
             return account()
         else:
-            return render_template("pages/login.html", message="Nom d'utilisateur ou mot de passe incorrect.")
+            return render_template(
+                "pages/login.html",
+                message="Nom d'utilisateur ou mot de passe incorrect.",
+            )
     return render_template("pages/login.html")
+
 
 @app.route("/logout")
 def logout():
@@ -165,19 +179,37 @@ def logout():
 # ---------------------------------------- USER -------------------------------------------
 # -----------------------------------------------------------------------------------------
 
+
 @app.route("/account")
 def account():
     if "username" in session:
         username = session["username"]
-        user = getUserName(username)
+        user = getUserInfo(username)
         return render_template("pages/account.html", user=user)
     else:
-        return render_template("pages/login.html", message="Vous devez être connecté pour accéder à votre compte.")
+        return login()
+
 
 @app.route("/update", methods=["GET", "POST"])
 def update_account():
     if "username" in session:
-        results = getUpdateInfo()
-        return render_template("pages/update.html", results=results)
-    else: 
-        return render_template("pages/login.html", message="Vous devez être connecté pour mettre à jour votre compte.")
+        username = session["username"]
+        user = getUserInfo(username)
+        update = getUpdateInfo()
+        return render_template("pages/update.html", user=user, update=update)
+    else:
+        return login()
+
+
+@app.route("/saveUpdateAccount", methods=["POST"])
+def update_account_post():
+    if "username" in session:
+        username = session["username"]
+        prenom = request.form["prenom"]
+        nom = request.form["nom"]
+        id_film = request.form["film"]
+        id_genre = request.form["genre"]
+        saveUpdateInfo(username, prenom, nom, id_film, id_genre)
+        return account()
+    else:
+        return login()

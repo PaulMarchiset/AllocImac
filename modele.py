@@ -374,7 +374,7 @@ def create_user(username, password, confirm_password):
         )
         mydb.commit()
         return "User created successfully, you can now log in."
-    
+
     except Exception:
         return "An error occurred. Please try again later."
 
@@ -391,7 +391,7 @@ def verify_user(username, password):
         return False
 
 
-def getUserName(username):
+def getUserInfo(username):
     mycursor.execute(
         """
         SELECT 
@@ -421,7 +421,28 @@ def getUserName(username):
 
 
 def getUpdateInfo():
-    mycursor.execute("""SELECT nom FROM FILM""")
+    mycursor.execute("""SELECT id, nom FROM FILM ORDER BY nom ASC""")
     films = mycursor.fetchall()
-    mycursor.execute("""SELECT nom FROM GENRE""")
+    mycursor.execute("""SELECT id, nom FROM GENRE ORDER BY nom ASC""")
     genres = mycursor.fetchall()
+    return {
+        "films": [{"id": film["id"], "nom": film["nom"]} for film in films],
+        "genres": [{"id": genre["id"], "nom": genre["nom"]} for genre in genres],
+    }
+
+def saveUpdateInfo(username, prenom, nom, id_film, id_genre):
+    mycursor.execute("""SELECT id_etudiant FROM UTILISATEUR WHERE username = %s""", (username,))
+    user = mycursor.fetchone()
+    if not user or user["id_etudiant"] is None: 
+        mycursor.execute("""INSERT INTO ETUDIANT (prenom, nom, id_film, id_genre) VALUES (%s, %s, %s, %s)""", (prenom, nom, id_film, id_genre))
+        mydb.commit()
+        mycursor.execute("""SELECT LAST_INSERT_ID()""")
+        etudiant_id = mycursor.fetchone()["LAST_INSERT_ID()"]
+        mycursor.execute("""UPDATE UTILISATEUR SET id_etudiant = %s WHERE username = %s""", (etudiant_id, username))
+    else:
+        etudiant_id = user["id_etudiant"]
+        mycursor.execute(
+            """UPDATE ETUDIANT SET prenom = %s, nom = %s, id_film = %s, id_genre = %s WHERE id = %s""",
+            (prenom, nom, id_film, id_genre, etudiant_id),
+        )
+    mydb.commit()
