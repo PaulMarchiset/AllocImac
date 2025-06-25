@@ -258,12 +258,51 @@ def admin():
             id = request.form["id"]
             nom = request.form["nom"]
             annee = request.form["annee"]
+            genres_ids = request.form.getlist("genres")
+            directors_ids = request.form.getlist("directors")
+
             mycursor.execute(
                 "UPDATE FILM SET nom=%s, annee=%s WHERE id=%s",
                 (nom, annee, id)
             )
+
+            # Mettre à jour les genres associés
+            mycursor.execute("DELETE FROM APPARTENANCE WHERE id_film=%s", (id,))
+            for genre_id in genres_ids:
+                mycursor.execute(
+                    "INSERT INTO APPARTENANCE (id_film, id_genre) VALUES (%s, %s)",
+                    (id, genre_id)
+                )
+
+            # Mettre à jour les réalisateurs associés
+            mycursor.execute("DELETE FROM DIRECTION WHERE id_film=%s", (id,))
+            for director_id in directors_ids:
+                mycursor.execute(
+                    "INSERT INTO DIRECTION (id_film, id_realisateur) VALUES (%s, %s)",
+                    (id, director_id)
+                )
+
             mydb.commit()
             flash("Film modifié !")
+            return redirect(url_for("admin"))
+        
+        # Supprimer un film
+        if form_type == "delete_film":
+            id = request.form["id"]
+            # Vérifier si le film est utilisé par un étudiant
+            mycursor.execute("SELECT COUNT(*) AS nb FROM ETUDIANT WHERE id_film=%s", (id,))
+            used_by_student = mycursor.fetchone()["nb"]
+            if used_by_student > 0:
+                flash("Impossible de supprimer ce film : il est utilisé par un étudiant.", "error")
+                return redirect(url_for("admin"))
+            # Supprimer les liens avec les genres (APPARTENANCE)
+            mycursor.execute("DELETE FROM APPARTENANCE WHERE id_film=%s", (id,))
+            # Supprimer les liens avec les réalisateurs (DIRECTION)
+            mycursor.execute("DELETE FROM DIRECTION WHERE id_film=%s", (id,))
+            # Supprimer le film
+            mycursor.execute("DELETE FROM FILM WHERE id=%s", (id,))
+            mydb.commit()
+            flash("Film supprimé !")
             return redirect(url_for("admin"))
         
         # Ajouter un genre
@@ -299,6 +338,23 @@ def admin():
             mydb.commit()
             flash("Genre modifié !")
             return redirect(url_for("admin"))
+        
+        # Supprimer un genre
+        if form_type == "delete_genre":
+            id = request.form["id"]
+            # Vérifier si le genre est utilisé par un film (table APPARTENANCE)
+            mycursor.execute("SELECT COUNT(*) AS nb FROM APPARTENANCE WHERE id_genre=%s", (id,))
+            used_by_film = mycursor.fetchone()["nb"]
+            # Vérifier si le genre est utilisé par un étudiant
+            mycursor.execute("SELECT COUNT(*) AS nb FROM ETUDIANT WHERE id_genre=%s", (id,))
+            used_by_student = mycursor.fetchone()["nb"]
+            if used_by_film > 0 or used_by_student > 0:
+                flash("Impossible de supprimer ce genre : il est utilisé par un film ou un étudiant.", "error")
+                return redirect(url_for("admin"))
+            mycursor.execute("DELETE FROM GENRE WHERE id=%s", (id,))
+            mydb.commit()
+            flash("Genre supprimé !")
+            return redirect(url_for("admin"))
 
         #Ajouter un réalisateur
         if form_type == "add_director":
@@ -333,6 +389,20 @@ def admin():
             mydb.commit()
             flash("Réalisateur modifié !")
             return redirect(url_for("admin"))
+        
+        # Supprimer un réalisateur
+        if form_type == "delete_director":
+            id = request.form["id"]
+            # Vérifier si le réalisateur est utilisé par un film (table DIRECTION)
+            mycursor.execute("SELECT COUNT(*) AS nb FROM DIRECTION WHERE id_realisateur=%s", (id,))
+            used_by_film = mycursor.fetchone()["nb"]
+            if used_by_film > 0:
+                flash("Impossible de supprimer ce réalisateur : il est utilisé par un film.", "error")
+                return redirect(url_for("admin"))
+            mycursor.execute("DELETE FROM REALISATEUR WHERE id=%s", (id,))
+            mydb.commit()
+            flash("Réalisateur supprimé !")
+            return redirect(url_for("admin"))
             
     # Pour modification/suppression d'un étudiant
     edit_student = None
@@ -345,6 +415,13 @@ def admin():
     if action in ["edit_film", "delete_film"] and edit_id:
         mycursor.execute("SELECT * FROM FILM WHERE id=%s", (edit_id,))
         edit_film = mycursor.fetchone()
+        if edit_film:
+            # Récupérer les genres associés
+            mycursor.execute("SELECT id_genre FROM APPARTENANCE WHERE id_film=%s", (edit_id,))
+            edit_film["genres_ids"] = [row["id_genre"] for row in mycursor.fetchall()]
+            # Récupérer les réalisateurs associés
+            mycursor.execute("SELECT id_realisateur FROM DIRECTION WHERE id_film=%s", (edit_id,))
+            edit_film["directors_ids"] = [row["id_realisateur"] for row in mycursor.fetchall()]
 
     # Pour modification/suppression d'un genre
     edit_genre = None
