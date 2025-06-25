@@ -7,7 +7,7 @@
       <div class="flex flex-col items-start justify-center gap-2">
         <p>
           {{ film.annee }} | {% for genre in film.genres %}
-          <a href="../genres#{{ genre.id }}" class="font-bold">{{ genre.nom }}</a>{% if not loop.last %}, {% endif %} {% endfor %}
+          <a href="../genres#genre-{{ genre.id }}" class="font-bold">{{ genre.nom }}</a>{% if not loop.last %}, {% endif %} {% endfor %}
         </p>
 
         <p>De {% for real in film.realisateurs %} <a href="../director/{{ real.id }}" class="font-bold">{{ real.nom }}</a>{% if not loop.last %}, {% endif %} {% endfor %}</p>
