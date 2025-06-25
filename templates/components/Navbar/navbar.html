@@ -35,7 +35,7 @@
       {% if session.username %}
       <div class="relative group">
         <a
-          href=""
+          href="{{url_for('account')}}"
           class="p-[0.625rem] block rounded-t-[0.625rem] hover:bg-[#fff6] font-bold uppercase text-sm"
           >Bonjour {{session.username}} !</a
         >
