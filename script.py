@@ -21,13 +21,18 @@ from modele import (
     getStudentsPaginated,
     countStudents,
     mycursor, 
-    mydb
+    mydb,
+    getUserName,
+    getUpdateInfo,
 )
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
 app.secret_key = "ma_cle_ultra_secrete_123456"
+
+from flask import session
+app.secret_key = "key"
 
 # -----------------------------------------------------------------------------------------
 # ---------------------------------------- ROUTES -----------------------------------------
@@ -149,12 +154,40 @@ def login():
         password = request.form["password"]
 
         if verify_user(username, password):
-            return index()
+            session["username"] = username
+            return account()
         else:
             return render_template("pages/login.html", message="Nom d'utilisateur ou mot de passe incorrect.")
+    return render_template("pages/login.html")
         # result = verify_user(username, password)
         # return render_template("pages/login.html", message=result)
-    return render_template("pages/login.html")
+
+@app.route("/logout")
+def logout():
+    session.pop("username", None)
+    return index()
+
+
+# -----------------------------------------------------------------------------------------
+# ---------------------------------------- USER -------------------------------------------
+# -----------------------------------------------------------------------------------------
+
+@app.route("/account")
+def account():
+    if "username" in session:
+        username = session["username"]
+        user = getUserName(username)
+        return render_template("pages/account.html", user=user)
+    else:
+        return render_template("pages/login.html", message="Vous devez être connecté pour accéder à votre compte.")
+
+@app.route("/update", methods=["GET", "POST"])
+def update_account():
+    if "username" in session:
+        results = getUpdateInfo()
+        return render_template("pages/update.html", results=results)
+    else: 
+        return render_template("pages/login.html", message="Vous devez être connecté pour mettre à jour votre compte.")
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():

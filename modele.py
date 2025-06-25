@@ -403,3 +403,39 @@ def verify_user(username, password):
         return check_password_hash(hashed_pw, password)
     else:
         return False
+
+
+def getUserName(username):
+    mycursor.execute(
+        """
+        SELECT 
+            e.prenom AS etu_prenom,
+            e.nom AS etu_nom, 
+            f.nom AS film_nom,
+            f.id AS film_id, 
+            g.nom AS genre_nom,
+            g.id AS genre_id
+        FROM ETUDIANT e 
+        JOIN FILM f ON e.id_film = f.id 
+        JOIN GENRE g ON e.id_genre = g.id 
+        JOIN UTILISATEUR u ON e.id = u.id_etudiant
+        WHERE u.username = %s
+    """,
+        (username,),
+    )
+    result = mycursor.fetchone()
+    if result:
+        return {
+            "prenom": result["etu_prenom"],
+            "nom": result["etu_nom"],
+            "film": {"nom": result["film_nom"], "id": result["film_id"]},
+            "genre": {"nom": result["genre_nom"], "id": result["genre_id"]},
+        }
+    return None
+
+
+def getUpdateInfo():
+    mycursor.execute("""SELECT nom FROM FILM""")
+    films = mycursor.fetchall()
+    mycursor.execute("""SELECT nom FROM GENRE""")
+    genres = mycursor.fetchall()
