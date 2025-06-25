@@ -23,12 +23,12 @@ from modele import (
     saveUpdateInfo,
 )
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
+app.secret_key = "ma_cle_ultra_secrete_123456"
 
 from flask import session
-
 app.secret_key = "key"
 
 # -----------------------------------------------------------------------------------------
@@ -167,6 +167,8 @@ def login():
                 message="Nom d'utilisateur ou mot de passe incorrect.",
             )
     return render_template("pages/login.html")
+        # result = verify_user(username, password)
+        # return render_template("pages/login.html", message=result)
 
 
 @app.route("/logout")
