@@ -7,24 +7,27 @@
       <ul class="flex flex-row justify-center gap-[0.375rem]">
         <li>
           <a
-            href=""
-            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_Facebook.svg)] mask-cover hover:bg-blue-500"
+            href="https://www.facebook.com/ingenieur.imac.officiel/"
+            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_Facebook.svg)] mask-cover hover:bg-[#39579a]"
+            target="_blank"
           >
           </a>
         </li>
 
         <li>
           <a
-            href=""
-            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_Linkedin.svg)] mask-cover hover:bg-black"
+            href="https://lnkd.in/eTjN2aGk"
+            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_Linkedin.svg)] mask-cover hover:bg-[#0a66c2]"
+            target="_blank"
           >
           </a>
         </li>
 
         <li>
           <a
-            href=""
-            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_insta.svg)] mask-cover hover:bg-red-500"
+            href="https://www.instagram.com/imacworldwide/"
+            class="block w-[45px] h-[45px] bg-white mask-[url(../../static/assets/images/Logo_insta.svg)] mask-cover hover:bg-[#f34558]"
+            target="_blank"
           >
           </a>
         </li>
@@ -33,11 +36,17 @@
     <section>
       {{ ui.title_footer("Menu AllocIMAC") }}
       <ul class="w-fit m-auto text-[0.9375rem]">
-        <li><a href="" class="hover:underline">Tous les étudiants</a></li>
-        <li><a href="" class="hover:underline">Top 5 Films</a></li>
-        <li><a href="" class="hover:underline">Top 5 Genres</a></li>
-        <li><a href="" class="hover:underline">Top 5 Real</a></li>
-        <li><a href="" class="hover:underline">Top 5 Décennies</a></li>
+        <li>
+          <a href="/students" class="hover:underline">Tous les étudiants</a>
+        </li>
+        <li><a href="/top5/films" class="hover:underline">Top 5 Films</a></li>
+        <li><a href="/top5/genres" class="hover:underline">Top 5 Genres</a></li>
+        <li>
+          <a href="/top5/directors" class="hover:underline">Top 5 Real</a>
+        </li>
+        <li>
+          <a href="/top5/decades" class="hover:underline">Top 5 Décennies</a>
+        </li>
       </ul>
     </section>
   </div>
@@ -45,9 +54,13 @@
     <p class="text-center mb-[0.3125rem]">
       <a href="" class="hover:underline">Portfolio Yohann Lai</a>
       <span>|</span>
-      <a href="" class="hover:underline">Portfolio Paul Marchiset</a>
+      <a href="https://paulmarchiset.me" class="hover:underline"
+        >Portfolio Paul Marchiset</a
+      >
       <span>|</span>
-      <a href="" class="hover:underline">Portfolio Lilian Peuron</a>
+      <a href="https://lilianpeuron.vercel.app" class="hover:underline"
+        >Portfolio Lilian Peuron</a
+      >
     </p>
     <p class="text-center">
       Projet réalisé dans le cadre d'un exercice pédagogique à l'IMAC - numéro
@@ -55,6 +68,32 @@
       <span class="text-[#fecc00] font-bold">0 893 892 891</span>
       (15,99€/minute)
     </p>
-    <p class="flex flex-row py-[0.625rem]"></p>
+    <p class="flex flex-row justify-center items-center gap-x-5 py-4">
+      <img
+        class="h-[34px]"
+        src="../../static/assets/images/logo_ESIEE.png"
+        alt=""
+      />
+      <img
+        class="h-[34px]"
+        src="../../static/assets/images/logo_cci_paris.png"
+        alt=""
+      />
+      <img
+        class="h-[34px]"
+        src="../../static/assets/images/logo_univ_eiffel.png"
+        alt=""
+      />
+      <img
+        class="h-[34px]"
+        src="../../static/assets/images/logo_cti.png"
+        alt=""
+      />
+      <img
+        class="h-[34px]"
+        src="../../static/assets/images/logo_eurace.png"
+        alt=""
+      />
+    </p>
   </div>
 </footer>
