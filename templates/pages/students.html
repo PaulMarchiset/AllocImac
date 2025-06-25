@@ -1,23 +1,49 @@
-{% extends "components/base.html" %} {% block title %} Les étudiants {% endblock %} {% block content %}
+{% extends "components/base.html" %} {% block title %} Les étudiants {% endblock
+%} {% block content %}
 <section class="p-32 flex flex-col items-start gap-12">
   <h2 class="text-3xl font-bold w-full">Tous les étudiants</h2>
-  <div class="flex flex-wrap gap-4">
-    {% if students %} {% set ns = namespace(current_letter='') %} {% for student in students %} {% set first_letter = student.nom[0]|upper %} {% if first_letter != ns.current_letter %} {% set
-    ns.current_letter = first_letter %}
-    <div class="w-full">
+  <div class="flex flex-wrap gap-2">
+    <button
+      class="letter-btn border rounded h-9 px-2 bg-black text-white border-black"
+      data-letter="ALL"
+    >
+      Tous
+    </button>
+
+    {% for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+    <button
+      class="letter-btn w-9 h-9 border rounded"
+      data-letter="{{ letter }}"
+    >
+      {{ letter }}
+    </button>
+    {% endfor %}
+  </div>
+  <div id="student-list" class="flex flex-wrap gap-4">
+    {% if students %} {% set ns = namespace(current_letter='') %} {% for student
+    in students %} {% set first_letter = student.nom[0]|upper %} {% if
+    first_letter != ns.current_letter %} {% set ns.current_letter = first_letter
+    %}
+    <div class="student-card w-full" data-letter="{{ first_letter }}">
       <div class="relative yellow-bar">
         <h3 class="text-2xl font-bold ml-3">{{ first_letter }}</h3>
       </div>
     </div>
     {% endif %}
 
-    <div class="border p-4 rounded-xl border border-black/20 w-72 h-20 flex flex-col items-center">
+    <div
+      class="student-card border p-4 rounded-xl border border-black/20 w-72 h-20 flex flex-col items-center"
+      data-letter="{{ first_letter }}"
+    >
       <h3 class="text-xl font-bold">{{ student.prenom }} {{ student.nom }}</h3>
-      <a href="/student/{{student.id}}" class="text-xs text-neutral-500">En savoir plus</a>
+      <a href="/student/{{student.id}}" class="text-xs text-neutral-500"
+        >En savoir plus</a
+      >
     </div>
     {% endfor %} {% else %}
     <h1>Aucun étudiant trouvé</h1>
     {% endif %}
+    <h1 class="no-result hidden">Aucun résultat pour cette lettre.</h1>
   </div>
 </section>
 {% endblock %}

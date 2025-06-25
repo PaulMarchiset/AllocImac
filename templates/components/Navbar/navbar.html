@@ -15,7 +15,7 @@
           />
           <button
             type="submit"
-            class="rounded-r-sm bg-white px-[0.75rem] before:content-[url('../../static/assets/images/icon_search.svg')]"
+            class="rounded-r-sm bg-white px-[0.75rem] before:content-[url('../../static/assets/images/icon_search.svg')] before:block before:h-5"
           ></button>
         </div>
         <span class="text-[10px]">
@@ -23,19 +23,35 @@
         </span>
       </form>
     </div>
-    <div class="flex flex-row justify-between font-bold uppercase text-sm">
-      <ul class="flex flex-row">
+    <div class="flex flex-row justify-between">
+      <ul class="flex flex-row font-bold uppercase text-sm">
         {{ ui.btn_navbar("Tous les étudiants","/students") }} {{
         ui.btn_navbar("Top 5 Films","/top5/films") }} {{ ui.btn_navbar("Top 5
         Genres","/top5/genres") }} {{ ui.btn_navbar("Top 5
-        Real","/top5/directors") }} {{ ui.btn_navbar("Top 5 Décennies",
+        Réal","/top5/directors") }} {{ ui.btn_navbar("Top 5 Décennies",
         "/top5/decades") }}
       </ul>
-      <a
-        href="/admin"
-        class="p-[0.625rem] block round rounded-t-[0.625rem] hover:bg-[#fff6]"
-        >Mon compte</a
-      >
+      <div class="relative group">
+        <a
+          href="/login"
+          class="p-[0.625rem] block round rounded-t-[0.625rem] hover:bg-[#fff6] font-bold uppercase text-sm"
+          >Mon compte</a
+        >
+        <div
+          class="absolute flex-col items-center gap-y-2 right-0 bg-white shadow-[0_0px_10px_rgba(0,0,0,0.25)] px-4 py-6 w-70 rounded-xl text-[0.675rem] uppercase before:content-[''] before:block before:absolute before:border-b-[0.625rem] before:border-b-white before:border-l-[0.625rem] before:border-l-transparent before:border-r-[0.625rem] before:border-r-transparent before:top-[-0.325rem] before:right-[0.875rem] z-100 group-hover:flex hidden"
+        >
+          <a
+            href="/login"
+            class="p-[0.625rem] block border-1 w-50 hover:bg-gray-200 text-center rounded-3xl"
+            >Identifiez-vous</a
+          >
+          <a
+            href="/signup"
+            class="p-[0.625rem] block border-1 w-50 hover:bg-gray-800 text-center rounded-3xl text-white bg-black"
+            >Créer votre compte</a
+          >
+        </div>
+      </div>
     </div>
   </div>
 </nav>

@@ -5,14 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}AllocIMAC{% endblock %}</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="shortcut icon" href="../../static/assets/icons/iconLogo.svg" type="image/x-icon" />
+    <link
+      rel="shortcut icon"
+      href="../../static/assets/icons/iconLogo.svg"
+      type="image/x-icon"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body class="font-[Montserrat] text-[#333]">
-    <header class="sticky top-0 z-100">{% include 'components/Navbar/navbar.html' %}</header>
-    <main>{%block content %} {% endblock %}</main>
+    <header class="sticky top-0 z-100">
+      {% include 'components/Navbar/navbar.html' %}
+    </header>
+    <main class="min-h-screen">{%block content %} {% endblock %}</main>
     {% include 'components/Footer/footer.html' %}
   </body>
   <style>
@@ -27,4 +36,34 @@
       top: 0.375rem;
     }
   </style>
+  <script>
+    const buttons = document.querySelectorAll(".letter-btn");
+    const cards = document.querySelectorAll(".student-card");
+    const noResult = document.querySelector(".no-result");
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const letter = button.dataset.letter;
+        let found = false;
+
+        buttons.forEach((btn) =>
+          btn.classList.remove("bg-black", "text-white", "border-black")
+        );
+        button.classList.add("bg-black", "text-white", "border-black");
+
+        cards.forEach((card) => {
+          const cardLetter = card.dataset.letter;
+          const match = letter === "ALL" || cardLetter === letter;
+          card.style.display = match ? "flex" : "none";
+          if (match) found = true;
+        });
+
+        if (!found) {
+          noResult.classList.remove("hidden");
+        } else {
+          noResult.classList.add("hidden");
+        }
+      });
+    });
+  </script>
 </html>
