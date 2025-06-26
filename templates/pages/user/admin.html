@@ -95,19 +95,28 @@
         </form>
       {% elif action == "edit_user" and edit_user %}
         <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
-          <input type="hidden" name="form_type" value="edit_user">
-          <input type="hidden" name="id" value="{{ edit_user.id }}">
-          <input name="username" value="{{ edit_user.username }}" placeholder="Nom d'utilisateur" required class="border p-2 rounded" />
-          <input name="password" type="password" placeholder="Mot de passe (laisser vide pour ne pas changer)" class="border p-2 rounded" />
-          <label for="id_etudiant">Associer à un étudiant (optionnel) :</label>
-          <select name="id_etudiant" id="id_etudiant" class="border p-2 rounded">
-            <option value="">Aucun</option>
-            {% for etu in all_students %}
-              <option value="{{ etu.id }}" {% if edit_user.id_etudiant == etu.id %}selected{% endif %}>{{ etu.display }}</option>
+        <input type="hidden" name="form_type" value="edit_user">
+        <input type="hidden" name="id" value="{{ edit_user.id }}">
+        <input name="username" value="{{ edit_user.username }}" placeholder="Nom d'utilisateur" required class="border p-2 rounded" />
+        <input name="password" type="password" placeholder="Nouveau mot de passe (vide pour ne pas changer)" class="border p-2 rounded" />
+        <input name="confirm_password" type="password" placeholder="Confirmation du mot de passe" class="border p-2 rounded" />
+        <label for="id_etudiant">Associer à un étudiant (optionnel) :</label>
+        <select name="id_etudiant" id="id_etudiant" class="border p-2 rounded">
+          <option value="">Aucun</option>
+          {% for etu in all_students %}
+            {% set already_linked = false %}
+            {% for user in users %}
+              {% if user.id_etudiant == etu.id and user.id != edit_user.id %}
+                {% set already_linked = true %}
+              {% endif %}
             {% endfor %}
-          </select>
-          <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier l'utilisateur</button>
-        </form>
+            <option value="{{ etu.id }}" {% if already_linked %}disabled{% endif %} {% if edit_user.id_etudiant == etu.id %}selected{% endif %}>
+              {{ etu.display }}{% if already_linked %} (déjà lié){% endif %}
+            </option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier l'utilisateur</button>
+      </form>
       <!-- Supprimer un utilisateur -->
       {% elif action == "delete_user_select" %}
         <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">

@@ -551,12 +551,25 @@ def addUser(username, password, confirm_password, id_etudiant):
     return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
-def editUser(id, username, password, id_etudiant):
+def editUser(id, username, password, confirm_password, id_etudiant):
     mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE username=%s AND id!=%s", (username, id))
     if mycursor.fetchone()["nb"] > 0:
         flash("Ce nom d'utilisateur existe déjà !", "error")
         return redirect(url_for("admin", action="edit_user", page=request.args.get("page", 1)))
+    # Vérifier qu'aucun autre utilisateur n'est déjà lié à cet étudiant
+    if id_etudiant:
+        mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE id_etudiant=%s AND id!=%s", (id_etudiant, id))
+        if mycursor.fetchone()["nb"] > 0:
+            flash("Cet étudiant a déjà un compte utilisateur !", "error")
+            return redirect(url_for("admin", action="edit_user", id=id, page=request.args.get("page", 1)))
+    # Si mot de passe fourni, vérifier la force et la confirmation
     if password:
+        if not is_strong_password(password):
+            flash("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un symbole.", "error")
+            return redirect(url_for("admin", action="edit_user", id=id, page=request.args.get("page", 1)))
+        if password != confirm_password:
+            flash("Les mots de passe ne correspondent pas.", "error")
+            return redirect(url_for("admin", action="edit_user", id=id, page=request.args.get("page", 1)))
         hashed_pw = generate_password_hash(password)
         mycursor.execute(
             "UPDATE UTILISATEUR SET username=%s, password=%s, id_etudiant=%s WHERE id=%s",

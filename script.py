@@ -319,8 +319,9 @@ def admin():
             id = request.form["id"]
             username = request.form["username"]
             password = request.form["password"]  # Peut être vide si pas de changement
+            confirm_password = request.form["confirm_password"]
             id_etudiant = request.form.get("id_etudiant") or None
-            editUser(id, username, password, id_etudiant)
+            editUser(id, username, password, confirm_password, id_etudiant)
 
         # Supprimer un utilisateur
         if form_type == "delete_user":
