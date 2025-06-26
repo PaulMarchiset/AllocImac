@@ -71,6 +71,9 @@ def index():
 def home():
     return render_template("pages/home.html")
 
+@app.route("/cherrier")
+def easterEgg():
+    return render_template("pages/cherrier.html")
 
 @app.route("/students")
 def students():
