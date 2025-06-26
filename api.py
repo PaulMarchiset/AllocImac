@@ -62,7 +62,7 @@ def home():
 
 @app.route("/api/students")
 def students():
-    
+
     return jsonify(getAllStudents())
 
 
@@ -165,42 +165,43 @@ def login():
     if not data:
         return jsonify({"success": False, "error": "Invalid data"}), 400
 
-    username = data.get("username")
-    password = data.get("password")
+    if data:
+        username = data.get("username")
+        password = data.get("password")
 
-    if request.method == "POST":
+    else:
         username = request.form["username"]
         password = request.form["password"]
 
-        if username == "admin" and password == "admin":
-            return (
-                jsonify(
-                    {
-                        "success": True,
-                        "data": {
-                            "message": "Admin login successful",
-                            "user": {"username": "admin", "role": "admin"},
-                        },
-                    }
-                ),
-                200,
-            )
+    if username == "admin" and password == "admin":
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "data": {
+                        "message": "Admin login successful",
+                        "user": {"username": "admin", "role": "admin"},
+                    },
+                }
+            ),
+            200,
+        )
 
-        if verify_user(username, password):
-            return (
-                jsonify(
-                    {
-                        "success": True,
-                        "data": {
-                            "message": "Login successful",
-                            "user": {"username": username, "role": "admin"},
-                        },
-                    }
-                ),
-                200,
-            )
+    if verify_user(username, password):
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "data": {
+                        "message": "Login successful",
+                        "user": {"username": username, "role": "admin"},
+                    },
+                }
+            ),
+            200,
+        )
 
-        return jsonify({"success": False, "error": "Invalid username or password"}), 401
+    return jsonify({"success": False, "error": "Invalid username or password"}), 401
 
 
 @app.route("/api/logout")
@@ -261,15 +262,20 @@ def get_students_api():
     students = getStudentsPaginated(offset=offset, limit=limit)
     total = countStudents()
 
-    return jsonify({
-        "students": students,
-        "pagination": {
-            "page": page,
-            "limit": limit,
-            "total": total,
-            "has_next": offset + limit < total
-        }
-    }), 200
+    return (
+        jsonify(
+            {
+                "students": students,
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total": total,
+                    "has_next": offset + limit < total,
+                },
+            }
+        ),
+        200,
+    )
 
 
 @app.route("/api/admin/students", methods=["POST"])
@@ -279,7 +285,7 @@ def add_student_api():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid data"}), 400
-    
+
     prenom = data.get("prenom")
     nom = data.get("nom")
     id_film = data.get("id_film")
@@ -289,6 +295,7 @@ def add_student_api():
         return jsonify({"error": "Missing required fields"}), 400
     addStudent(prenom, nom, id_film, id_genre)
     return jsonify({"message": "Student added successfully"}), 201
+
 
 @app.route("/api/admin/students/<int:id>", methods=["PUT"])
 def edit_student_api(id):
@@ -308,6 +315,7 @@ def edit_student_api(id):
     editStudent(id, prenom, nom, id_film, id_genre)
     return jsonify({"message": "Student updated successfully"}), 200
 
+
 @app.route("/api/admin/students/<int:id>", methods=["DELETE"])
 def delete_student_api(id):
     if session.get("username") != "admin":
@@ -324,6 +332,7 @@ def get_films_api():
     films = getAllFilms()
     return jsonify(films), 200
 
+
 @app.route("/api/admin/film", methods=["POST"])
 def add_film_api():
     if session.get("username") != "admin":
@@ -331,7 +340,7 @@ def add_film_api():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid data"}), 400
-    
+
     nom = data.get("nom")
     annee = data.get("annee")
     genres_ids = data.get("genres", [])
@@ -341,6 +350,7 @@ def add_film_api():
         return jsonify({"error": "Missing required fields"}), 400
     addFilm(nom, annee, genres_ids, directors_ids)
     return jsonify({"message": "Film added successfully"}), 201
+
 
 @app.route("/api/admin/film/<int:id>", methods=["PUT"])
 def edit_film_api(id):
@@ -360,12 +370,14 @@ def edit_film_api(id):
     editFilm(id, nom, annee, genres_ids, directors_ids)
     return jsonify({"message": "film updated successfully"}), 200
 
+
 @app.route("/api/admin/film/<int:id>", methods=["DELETE"])
 def delete_film_api(id):
     if session.get("username") != "admin":
         return jsonify({"error": "Unauthorized"}), 403
     deleteFilm(id)
     return jsonify({"message": "Film deleted successfully"}), 200
+
 
 # GENRES API
 @app.route("/api/admin/genres", methods=["GET"])
@@ -375,6 +387,7 @@ def get_genres_api():
     genres = getAllGenres()
     return jsonify(genres), 200
 
+
 @app.route("/api/admin/genre", methods=["POST"])
 def add_genre_api():
     if session.get("username") != "admin":
@@ -382,13 +395,14 @@ def add_genre_api():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid data"}), 400
-    
+
     nom = data.get("nom")
 
     if not nom:
         return jsonify({"error": "Missing required fields"}), 400
     addGenre(nom)
     return jsonify({"message": "Genre added successfully"}), 201
+
 
 @app.route("/api/admin/genre/<int:id>", methods=["PUT"])
 def edit_genre_api(id):
@@ -405,12 +419,14 @@ def edit_genre_api(id):
     editGenre(id, nom)
     return jsonify({"message": "genre updated successfully"}), 200
 
+
 @app.route("/api/admin/genre/<int:id>", methods=["DELETE"])
 def delete_genre_api(id):
     if session.get("username") != "admin":
         return jsonify({"error": "Unauthorized"}), 403
     deleteGenre(id)
     return jsonify({"message": "Genre deleted successfully"}), 200
+
 
 # DIRECTORS API
 @app.route("/api/admin/directors", methods=["GET"])
@@ -420,6 +436,7 @@ def get_directors_api():
     directors = getAllDirectors()
     return jsonify(directors), 200
 
+
 @app.route("/api/admin/director", methods=["POST"])
 def add_director_api():
     if session.get("username") != "admin":
@@ -427,13 +444,14 @@ def add_director_api():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid data"}), 400
-    
+
     nom = data.get("nom")
 
     if not nom:
         return jsonify({"error": "Missing required fields"}), 400
     addDirector(nom)
     return jsonify({"message": "Director added successfully"}), 201
+
 
 @app.route("/api/admin/director/<int:id>", methods=["PUT"])
 def edit_director_api(id):
@@ -449,6 +467,7 @@ def edit_director_api(id):
         return jsonify({"error": "Missing required fields"}), 400
     editDirector(id, nom)
     return jsonify({"message": "Director updated successfully"}), 200
+
 
 @app.route("/api/admin/director/<int:id>", methods=["DELETE"])
 def delete_director_api(id):
