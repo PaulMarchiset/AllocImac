@@ -60,7 +60,7 @@
           <select name="id_film" required class="border p-2 rounded">
             <option value="">Film préféré</option>
             {% for film in films %}
-              <option value="{{ film.id }}">{{ film.nom }}</option>
+              <option value="{{ film.id }}">{{ film.nom }} ({{ film.annee }})</option>
             {% endfor %}
           </select>
           <select name="id_genre" required class="border p-2 rounded">
@@ -80,7 +80,7 @@
           <input name="nom" value="{{ edit_student.nom }}" placeholder="Nom de l'étudiant" required class="border p-2 rounded" />
           <select name="id_film" required class="border p-2 rounded">
             {% for film in films %}
-              <option value="{{ film.id }}" {% if film.id == edit_student.id_film %}selected{% endif %}>{{ film.nom }}</option>
+              <option value="{{ film.id }}" {% if film.id == edit_student.id_film %}selected{% endif %}>{{ film.nom }} ({{ film.annee }})</option>
             {% endfor %}
           </select>
           <select name="id_genre" required class="border p-2 rounded">
@@ -96,7 +96,7 @@
           <select name="id" id="student_id" class="border p-2 rounded" required>
             <option value="">-- Sélectionner --</option>
             {% for etu in all_students %}
-              <option value="{{ etu.id }}">{{ etu.prenom }} {{ etu.nom }}</option>
+              <option value="{{ etu.id }}">{{ etu.display }}</option>
             {% endfor %}
           </select>
           <input type="hidden" name="action" value="edit_student">
@@ -117,7 +117,7 @@
           <select name="id" id="student_id_del" class="border p-2 rounded" required>
             <option value="">-- Sélectionner --</option>
             {% for etu in all_students %}
-              <option value="{{ etu.id }}">{{ etu.prenom }} {{ etu.nom }}</option>
+              <option value="{{ etu.id }}">{{ etu.display }}</option>
             {% endfor %}
           </select>
           <input type="hidden" name="action" value="delete_student">
@@ -215,7 +215,7 @@
           <select name="id" id="film_id" class="border p-2 rounded" required>
             <option value="">-- Sélectionner --</option>
             {% for film in films %}
-              <option value="{{ film.id }}">{{ film.nom }}</option>
+              <option value="{{ film.id }}">{{ film.nom }} ({{ film.annee }})</option>
             {% endfor %}
           </select>
           <input type="hidden" name="action" value="edit_film">
@@ -236,7 +236,7 @@
           <select name="id" id="film_id_del" class="border p-2 rounded" required>
             <option value="">-- Sélectionner --</option>
             {% for film in films %}
-              <option value="{{ film.id }}">{{ film.nom }}</option>
+              <option value="{{ film.id }}">{{ film.nom }} ({{ film.annee }})</option>
             {% endfor %}
           </select>
           <input type="hidden" name="action" value="delete_film">

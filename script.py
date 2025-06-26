@@ -47,7 +47,7 @@ from modele import (
     mydb,
 )
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -363,6 +363,9 @@ def admin():
     genres = getAllGenres()
     directors = getAllDirectors()
     all_students = getAllStudentsShort()
+
+    for etu in all_students:
+        etu['display'] = f"{etu['prenom']} {etu['nom']} (ID : {etu['id']})"
 
     return render_template(
         "pages/user/admin.html",
