@@ -168,30 +168,44 @@
         </form>
       <!-- Modifier un film -->
       {% elif action == "edit_film" and edit_film %}
-        <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
-          <input type="hidden" name="form_type" value="edit_film">
-          <input type="hidden" name="id" value="{{ edit_film.id }}">
-          <input name="nom" value="{{ edit_film.nom }}" placeholder="Nom du film" required class="border p-2 rounded" />
-          <input name="annee" value="{{ edit_film.annee }}" placeholder="Année" type="number" required class="border p-2 rounded" />
-          <label>Genres</label>
-          <div class="border rounded p-2 mb-2" style="max-height: 120px; overflow-y: auto;">
-            {% for genre in genres %}
-              <label class="flex items-center gap-1">
-                <input type="checkbox" name="genres" value="{{ genre.id }}"
-                  {% if genre.id in edit_film.genres_ids %}checked{% endif %}>
-                {{ genre.nom }}
-              </label>
-            {% endfor %}
-          </div>
-          <label>Réalisateurs</label>
-          <div class="border rounded p-2 mb-2" style="max-height: 120px; overflow-y: auto;">
-            {% for director in directors %}
-              <label class="flex items-center gap-1">
-                <input type="checkbox" name="directors" value="{{ director.id }}"
-                  {% if director.id in edit_film.directors_ids %}checked{% endif %}>
-                {{ director.nom }}
-              </label>
-            {% endfor %}
+        <form method="post" class="flex flex-col gap-2 w-full" autocomplete="off">
+          <div class="grid grid-cols-3 items-start gap-4">
+            <div class="flex flex-col gap-y-2">
+              <input type="hidden" name="form_type" value="edit_film">
+              <input type="hidden" name="id" value="{{ edit_film.id }}">
+              <div class="flex flex-col">
+                <label for="nom">Nom du film</label>
+                <input name="nom" value="{{ edit_film.nom }}" placeholder="Nom du film" required class="border p-2 rounded" />
+              </div>
+              <div class="flex flex-col">
+                <label for="annee">Année</label>
+                <input name="annee" value="{{ edit_film.annee }}" placeholder="Année" type="number" required class="border p-2 rounded" />
+              </div>
+            </div>
+            <div>
+              <label>Genres</label>
+              <div class="border rounded p-2 mb-2 h-[50vh] overflow-y-auto">
+                {% for genre in genres %}
+                  <label class="flex items-center gap-2 mb-1">
+                    <input type="checkbox" name="genres" value="{{ genre.id }}"
+                      {% if genre.id in edit_film.genres_ids %}checked{% endif %}>
+                    {{ genre.nom }}
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+            <div>
+              <label>Réalisateurs</label>
+              <div class="border rounded p-2 mb-2 h-[50vh] overflow-y-auto">
+                {% for director in directors %}
+                  <label class="flex items-center gap-2 mb-1">
+                    <input type="checkbox" name="directors" value="{{ director.id }}"
+                      {% if director.id in edit_film.directors_ids %}checked{% endif %}>
+                    {{ director.nom }}
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
           </div>
           <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier le film</button>
         </form>
