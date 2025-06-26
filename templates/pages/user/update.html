@@ -1,40 +1,40 @@
 {% extends "components/base.html" %} {% block title %} Modifier votre compte {% endblock %} {%block content %}
-<section class="p-32 flex flex-col items-center gap-32">
+<section class="p-32 flex flex-col items-center gap-10">
   <div class="flex flex-col items-center gap-4">
-    <h2 class="text-black text-4xl font-bold">Bonjour {{ user.prenom }} !</h2>
-    <p class="text-black text-lg">Vous pouvez modifier vos informations ci-dessous.</p>
+    <h2 class="text-4xl font-bold uppercase">Bonjour {{ session.username }} !</h2>
+    <p class=" text-xs font-semibold uppercase" >Vous pouvez modifier vos informations ci-dessous.</p>
   </div>
-  <form action="/update" method="post" class="flex flex-col gap-6 w-1/2">
-    <label class="flex flex-col text-black font-semibold">
-      Prénom :
-      <input type="text" name="prenom" value="{{ user.prenom }}" class="p-2 rounded" required />
-    </label>
+  <form action="/saveUpdateAccount" method="post" class="flex flex-col gap-y-4 items-center">
 
-    <label class="flex flex-col text-black font-semibold">
-      Nom :
-      <input type="text" name="nom" value="{{ user.nom }}" class="p-2 rounded" required />
-    </label>
+      <input type="text" name="prenom" placeholder="Prénom" value="{{ user.prenom }}" class="border border-[#737373] py-4 px-3 rounded-md w-full placeholder:uppercase" required />
 
-    <select name="film" required>
-  {% for film in update.films %}
-    <option value="{{ film.id }}"
-      {% if user.film and film.id == user.film.id %}selected{% endif %}>
-      {{ film.nom }}
-    </option>
-  {% endfor %}
-</select>
+      <input type="text" name="nom" placeholder="Nom" value="{{ user.nom }}" class="border border-[#737373] py-4 px-3 rounded-md w-full placeholder:uppercase" required />
 
-<select name="genre" required>
-  {% for genre in update.genres %}
-    <option value="{{ genre.id }}"
-      {% if user.genre and genre.id == user.genre.id %}selected{% endif %}>
-      {{ genre.nom }}
-    </option>
-  {% endfor %}
-</select>
+    <div class="w-full flex flex-col gap-1">
+      <label for="film">Votre film préféré</label>
+      <select name="film" class="w-full p-2" required>
+      {% for film in update.films %}
+        <option value="{{ film.id }}"
+          {% if user.film and film.id == user.film.id %}selected{% endif %}>
+          {{ film.nom }}
+        </option>
+      {% endfor %}
+      </select>
+    </div>
 
+    <div class="w-full flex flex-col gap-1">
+      <label for="genre">Votre genre préféré</label>
+      <select name="genre" class="w-full p-2" required>
+        {% for genre in update.genres %}
+          <option value="{{ genre.id }}"
+            {% if user.genre and genre.id == user.genre.id %}selected{% endif %}>
+            {{ genre.nom }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
 
-    <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-500">Enregistrer</button>
+    <button type="submit" class="bg-[#FECC00] hover:bg-[#e9bb01] hover:cursor-pointer px-6 py-3 rounded-3xl w-100 uppercase font-semibold">Enregistrer</button>
   </form>
 </section>
 {% endblock %}

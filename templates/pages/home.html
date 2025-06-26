@@ -1,4 +1,170 @@
 {% extends "components/base.html" %} {% block title %} Page d'accueil {%
 endblock %} {%block content %}
-<h2 class="text-2xl">Bienvenue sur la page d'accueil !</h2>
+<section class="flex flex-col items-center pt-4">
+  <div class="swiper w-[70%] h-[500px]">
+    <div class="swiper-wrapper">
+      <!-- Slides -->
+      <div
+        class="swiper-slide bg-[url('../../static/assets/images/sylvain-cherrier-distingue.png')] bg-cover bg-center"
+      >
+        <div
+          class="flex flex-col items-center justify-end w-full h-full pb-20 px-20"
+        >
+          <div class="text-white text-center w-full h-1/5">
+            <h2
+              class="font-semibold text-[1.875rem] text-shadow-[2px_1px_1px_#000]"
+            >
+              Sylvain Cherrier distingué : la croix du combattant remise par M.
+              Founé.
+            </h2>
+            <span class="text-shadow-[2px_1px_1px_#000] text-[0.9375rem]"
+              >Cette médaille lui a été décernée au titre d’ancien des missions
+              extérieures.
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="swiper-slide bg-[url('../../static/assets/images/803Z-photo.png')] bg-cover bg-center"
+      >
+        <div
+          class="flex flex-col items-center justify-end w-full h-full pb-20 px-20"
+        >
+          <div class="text-white text-center w-full h-1/5">
+            <h2
+              class="font-semibold text-[1.875rem] text-shadow-[2px_1px_1px_#000]"
+            >
+              Les 24H du court métrage de 803Z
+            </h2>
+            <span class="text-shadow-[2px_1px_1px_#000] text-[0.9375rem]"
+              >Des histoires renversantes, des acteurs de talent et une
+              réalisation époustouflante. <br />
+              Découvrez les courts métrages de 803Z.
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="swiper-slide bg-[url('../../static/assets/images/cherrier-histoire.png')] bg-cover bg-center"
+      >
+        <div class="flex flex-col items-center justify-end w-full h-full pb-20">
+          <div class="text-white text-center w-full h-1/5">
+            <h2
+              class="font-semibold text-[1.875rem] text-shadow-[2px_1px_1px_#000]"
+            >
+              Sylvain Cherrier : histoire d'un truc qu'on a pas écouté.
+            </h2>
+            <span class="text-shadow-[2px_1px_1px_#000] text-[0.9375rem]"
+              >Je crois qu'il parle d'étudiants à un moment mais ça avait l'air
+              long
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="swiper-slide bg-[url('../../static/assets/images/join_803Z.png')] bg-cover bg-center"
+      >
+        <div class="flex flex-col items-center justify-end w-full h-full pb-20">
+          <div class="text-white text-center w-full h-1/5">
+            <h2
+              class="font-semibold text-[1.875rem] text-shadow-[2px_1px_1px_#000]"
+            >
+              Rejoignez 803Z et devenez acteur de l'aventure !
+            </h2>
+            <span class="text-shadow-[2px_1px_1px_#000] text-[0.9375rem]">
+              Vous avez toujours rêvé de faire du cinéma ? De réaliser des
+              courts métrages ? <br />
+              De devenir acteur ou actrice ? Rejoignez-nous
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="swiper-slide bg-[url('../../static/assets/images/sylvain_momoa.png')] bg-cover bg-center"
+      >
+        <div class="flex flex-col items-center justify-end w-full h-full pb-20">
+          <div class="text-white text-center w-full h-1/5">
+            <h2
+              class="font-semibold text-[1.875rem] text-shadow-[2px_1px_1px_#000]"
+            >
+              Il a affronté Stallone et Vin Diesel
+            </h2>
+            <span class="text-shadow-[2px_1px_1px_#000] text-[0.9375rem]"
+              >Cette star du film d'action formera un nouveau duo inattendu pour
+              un projet tenu secret</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- pagination -->
+    <div class="swiper-pagination"></div>
+
+    <!-- navigation buttons -->
+    <div
+      class="swiper-button-prev !text-white !bg-black !rounded-full !p-2 !w-10 !h-10"
+    ></div>
+    <div
+      class="swiper-button-next !text-white !bg-black !rounded-full !p-2 !w-10 !h-10"
+    ></div>
+  </div>
+  <div class="relative w-[70%] mt-10">
+    <h2
+      class="uppercase font-bold my-4 text-3xl text-center before:content-[''] before:absolute before:block before:bg-[#fecc00] before:w-20 before:h-[0.3125rem] before:rounded-full before:mb-2 before:left-1/2 before:translate-x-[-50%] before:top-0"
+    >
+      WORKSHOP - PROG WEB : ALLOCIMAC
+    </h2>
+    <p>
+      Notre projet s’intitule AllocIMAC. Il prend effectivement modèle sur le
+      site de cinéma Allociné. Il répertorie les préférences cinématographiques
+      des étudiants de notre promotion de l’IMAC, collectées grâce à un sondage
+      sur le film et le genre cinématographique préféré.
+    </p>
+  </div>
+  <div class="relative w-[70%] my-10">
+    <h2
+      class="uppercase font-bold my-4 text-3xl text-center before:content-[''] before:absolute before:block before:bg-[#fecc00] before:w-20 before:h-[0.3125rem] before:rounded-full before:mb-2 before:left-1/2 before:translate-x-[-50%] before:top-0"
+    >
+      L'équipe de choc
+    </h2>
+    <div class="flex flex-row justify-center gap-x-10">
+      <section class="flex flex-col gap-2">
+        <div
+          class="w-60 h-80 rounded-xl bg-[url('../../static/assets/images/imageNotFound.svg')] bg-cover bg-center"
+        ></div>
+        <div>
+          <h3 class="text-xl font-semibold uppercase">Yohann Lai</h3>
+          <span class="text-xs">Chef de projet, Back-end développeur</span>
+        </div>
+      </section>
+      <section class="flex flex-col gap-2">
+        <div
+          class="w-60 h-80 rounded-xl bg-[url('../../static/assets/images/paul-photo.jpg')] bg-cover bg-center"
+        ></div>
+        <div>
+          <h3 class="text-xl font-semibold uppercase">Paul Marchiset</h3>
+          <span class="text-xs">Full-stack développeur</span>
+        </div>
+      </section>
+      <section class="flex flex-col gap-2">
+        <div
+          class="w-60 h-80 rounded-xl bg-[url('../../static/assets/images/lilian-photo.jpg')] bg-cover bg-center"
+        ></div>
+        <h3 class="text-xl font-semibold uppercase">Lilian Peuron</h3>
+        <span class="text-xs">Full-stack développeur</span>
+      </section>
+    </div>
+  </div>
+</section>
+<style>
+  .swiper-button-prev::after,
+  .swiper-button-next::after {
+    font-size: 1rem !important;
+    font-weight: bold !important;
+  }
+
+  .swiper-pagination-bullet-active {
+    background-color: #fecc00 !important;
+  }
+</style>
 {% endblock %}

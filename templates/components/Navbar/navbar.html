@@ -11,7 +11,7 @@
             name="search"
             id=""
             class="bg-white w-[360px] placeholder:font-bold placeholder:text-[#737373] rounded-l-sm text-xs py-[0.625rem] px-[0.875rem]"
-            placeholder="Rechercher un film, une série, une star..."
+            placeholder="Rechercher un film, un réalisateur ou un étudiant"
           />
           <button
             type="submit"
@@ -19,17 +19,17 @@
           ></button>
         </div>
         <span class="text-[10px]">
-          Ex. : Meilleurs films d'animation Disney, Meilleurs films Pixar
-        </span>
+          Ex. : Star Wars, Andrew Stanton, Marchiset,...</span
+        >
       </form>
     </div>
     <div class="flex flex-row justify-between">
       <ul class="flex flex-row font-bold uppercase text-sm">
-        {{ ui.btn_navbar("Tous les étudiants","/students") }}
-        {{ ui.btn_navbar("Top 5 Films","/top5/films") }}
-        {{ ui.btn_navbar("Top 5 Genres","/top5/genres") }}
-        {{ ui.btn_navbar("Top 5 Real","/top5/directors") }}
-        {{ ui.btn_navbar("Top 5 Décennies", "/top5/decades") }}
+        {{ ui.btn_navbar("Tous les étudiants","/students") }} {{
+        ui.btn_navbar("Top 5 Films","/top5/films") }} {{ ui.btn_navbar("Top 5
+        Genres","/top5/genres") }} {{ ui.btn_navbar("Top 5
+        Real","/top5/directors") }} {{ ui.btn_navbar("Top 5 Décennies",
+        "/top5/decades") }}
       </ul>
 
       {% if session.username == 'admin' %}
@@ -65,8 +65,13 @@
           class="absolute flex-col items-center gap-y-2 right-0 bg-white shadow-[0_0px_10px_rgba(0,0,0,0.25)] px-4 py-6 w-70 rounded-xl text-[0.675rem] uppercase before:content-[''] before:block before:absolute before:border-b-[0.625rem] before:border-b-white before:border-l-[0.625rem] before:border-l-transparent before:border-r-[0.625rem] before:border-r-transparent before:top-[-0.325rem] before:right-[0.875rem] z-100 group-hover:flex hidden"
         >
           <a
-            href="{{ url_for('update_account') }}"
+            href="{{ url_for('account') }}"
             class="p-[0.625rem] block border-1 w-50 hover:bg-gray-200 text-center rounded-3xl"
+            >Voir mon profil</a
+          >
+          <a
+            href="{{ url_for('update_account') }}"
+            class="p-[0.625rem] block border-1 w-50 hover:bg-blue-400 text-center rounded-3xl bg-blue-500 text-white"
             >Modifier mon profil</a
           >
           <a
@@ -76,7 +81,7 @@
           >
         </div>
       </div>
-      
+
       {% else %}
       <div class="relative group">
         <a
