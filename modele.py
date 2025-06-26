@@ -484,6 +484,7 @@ def addStudent(prenom, nom, id_film, id_genre):
     )
     mydb.commit()
     flash("Étudiant ajouté !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def editStudent(id, prenom, nom, id_film, id_genre):
@@ -506,6 +507,7 @@ def editStudent(id, prenom, nom, id_film, id_genre):
     )
     mydb.commit()
     flash("Étudiant modifié !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def deleteStudent(id):
@@ -514,6 +516,7 @@ def deleteStudent(id):
     mycursor.execute("DELETE FROM ETUDIANT WHERE id=%s", (id,))
     mydb.commit()
     flash("Étudiant supprimé !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def addFilm(nom, annee):
@@ -551,6 +554,7 @@ def addFilm(nom, annee):
         )
     mydb.commit()
     flash("Film ajouté !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def editFilm(id, nom, annee, genres_ids, directors_ids):
@@ -586,6 +590,7 @@ def editFilm(id, nom, annee, genres_ids, directors_ids):
 
     mydb.commit()
     flash("Film modifié !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def deleteFilm(id):
@@ -608,6 +613,7 @@ def deleteFilm(id):
     mycursor.execute("DELETE FROM FILM WHERE id=%s", (id,))
     mydb.commit()
     flash("Film supprimé !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def addGenre(nom):
@@ -623,6 +629,7 @@ def addGenre(nom):
     mycursor.execute("INSERT INTO GENRE (nom) VALUES (%s)", (nom,))
     mydb.commit()
     flash("Genre ajouté !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def editGenre(id, nom):
@@ -637,6 +644,7 @@ def editGenre(id, nom):
     mycursor.execute("UPDATE GENRE SET nom=%s WHERE id=%s", (nom, id))
     mydb.commit()
     flash("Genre modifié !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def deleteGenre(id):
@@ -659,6 +667,7 @@ def deleteGenre(id):
     mycursor.execute("DELETE FROM GENRE WHERE id=%s", (id,))
     mydb.commit()
     flash("Genre supprimé !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def addDirector(nom):
@@ -675,6 +684,7 @@ def addDirector(nom):
     mycursor.execute("INSERT INTO REALISATEUR (nom) VALUES (%s)", (nom,))
     mydb.commit()
     flash("Réalisateur ajouté !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def editDirector(id, nom):
@@ -689,6 +699,7 @@ def editDirector(id, nom):
     mycursor.execute("UPDATE REALISATEUR SET nom=%s WHERE id=%s", (nom, id))
     mydb.commit()
     flash("Réalisateur modifié !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def deleteDirector(id):
@@ -706,6 +717,7 @@ def deleteDirector(id):
     mycursor.execute("DELETE FROM REALISATEUR WHERE id=%s", (id,))
     mydb.commit()
     flash("Réalisateur supprimé !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
 
 
 def getStudentByIdFull(id):
