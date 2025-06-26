@@ -8,6 +8,7 @@ import mysql.connector
 from modele import (
     getAllStudents,
     getStudentById,
+    userCount,
     oneFilm,
     oneDirector,
     allGenres,
@@ -48,9 +49,11 @@ from modele import (
     getUserById,
     getStudentsPaginated,
     countStudents,
+    getTotalFilmRanking,
+    getTotalGenreRanking,
 )
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
@@ -71,22 +74,50 @@ def index():
 def home():
     return render_template("pages/home.html")
 
+@app.route("/cherrier")
+def easterEgg():
+    return render_template("pages/cherrier.html")
 
+# Afficher tous les étudiants
 @app.route("/students")
 def students():
     students = getAllStudents()
     return render_template("pages/students.html", students=students)
 
-
+# Afficher un étudiant spécifique
 @app.route("/student/<int:id>")
 def student(id):
     student = getStudentById(id)
     if student:
-        return render_template("pages/student.html", student=student)
+        # Récupérer le classement du film préféré de l'étudiant
+        film_id = student["film"]["id"]
+        film_ranking=getTotalFilmRanking()
+
+        classement_film = None
+        film_info = None
+        for index, film in enumerate(film_ranking, start=1):
+            if film["film_id"] == film_id:
+                classement_film = index
+                film_info = film
+                break
+
+        # Récupérer le classement du genre préféré de l'étudiant
+        genre_id = student["genre"]["id"]
+        genre_ranking = getTotalGenreRanking()
+
+        classement_genre = None
+        genre_info = None
+        for index, genre in enumerate(genre_ranking, start=1):
+            if genre["id_genre"] == genre_id:
+                classement_genre = index
+                genre_info = film
+                break
+
+        return render_template("pages/student.html", student=student, classement_film=classement_film, film_info=film_info, classement_genre=classement_genre, genre_info=genre_info)
     else:
         return "Student not found", 404
 
-
+# Afficher un film spécifique
 @app.route("/film/<int:id>")
 def film(id):
     film = oneFilm(id)
@@ -95,7 +126,7 @@ def film(id):
     else:
         return "Film not found", 404
 
-
+# Afficher un réalisateur spécifique
 @app.route("/director/<int:id>")
 def director(id):
     director = oneDirector(id)
@@ -104,7 +135,7 @@ def director(id):
     else:
         return "Director not found", 404
 
-
+# Afficher tous les genres
 @app.route("/genres")
 def genres():
     genres = allGenres()
@@ -115,25 +146,25 @@ def genres():
 # ---------------------------------------- TOP 5 ------------------------------------------
 # -----------------------------------------------------------------------------------------
 
-
+# Afficher le top 5 des films choisis par les étudiants
 @app.route("/top5/films")
 def top5_films():
     films = top5Film()
     return render_template("pages/top5/films.html", films=films)
 
-
+# Afficher le top 5 des genres choisis par les étudiants
 @app.route("/top5/genres")
 def top5_genres():
     genres = top5Genre()
     return render_template("pages/top5/genres.html", genres=genres)
 
-
+# Afficher le top 5 des réalisateurs par rapport aux films choisis par les étudiants
 @app.route("/top5/directors")
 def top5_directors():
     directors = top5Realisateur()
     return render_template("pages/top5/directors.html", directors=directors)
 
-
+# Afficher le top 5 des décennies par rapport aux films choisis par les étudiants
 @app.route("/top5/decades")
 def top5_decades():
     decades = top5Decennies()
@@ -144,12 +175,13 @@ def top5_decades():
 # ---------------------------------------- SEARCH ------------------------------------------
 # -----------------------------------------------------------------------------------------
 
-
+# Afficher les résultats de recherche par rapport à la requête de l'utilisateur sur la barre de recherche
 @app.route("/search", methods=["GET"])
 def search():
     q = request.args.get("search", "").strip()
     films, directors, students = [], [], []
 
+    # Rechercher dans la table films, réalisateurs et étudiants
     if q:
         films, directors, students = search_query(q)
 
@@ -161,21 +193,28 @@ def search():
         students=students,
     )
 
+# Afficher le nombre total d'utilisateurs en JSON
+@app.route("/api/user-count")
+def userCount_api():
+    total = userCount()
+    return jsonify({"total_users": total})
+
 
 # -----------------------------------------------------------------------------------------
 # ------------------------------------- AUTHENTICATION ------------------------------------
 # -----------------------------------------------------------------------------------------
 
-
+# Afficher la page d'inscription et traiter le formulaire d'inscription
 @app.route("/signup", methods=["GET", "POST"])
 def signup_page():
     if request.method == "POST":
+        # Ajouter un nouvel utilisateur
         result = create_user(
             request.form["username"],
             request.form["password"],
             request.form["confirm-password"],
         )
-        if result == "success":
+        if result:
             session["username"] = request.form["username"]
             return account()
         else:
@@ -185,17 +224,19 @@ def signup_page():
             )
     return render_template("pages/user/signup.html")
 
-
+# Afficher la page de connexion et traiter le formulaire de connexion
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
 
+        # Si l'utilisateur est admin, rediriger vers la page d'administration
         if username == "admin" and password == "admin":
             session["username"] = username
             return admin()
 
+        # Vérifier les informations de l'utilisateur
         if verify_user(username, password):
             session["username"] = username
             return account()
@@ -207,6 +248,7 @@ def login():
     return render_template("pages/user/login.html")
 
 
+# Déconnecter l'utilisateur et rediriger vers la page d'accueil
 @app.route("/logout")
 def logout():
     session.pop("username", None)
@@ -217,9 +259,10 @@ def logout():
 # ---------------------------------------- USER -------------------------------------------
 # -----------------------------------------------------------------------------------------
 
-
+# Afficher la page du compte utilisateur
 @app.route("/account")
 def account():
+    # Si l'utilisateur est connecté, on affiche ses informations
     if "username" in session:
         username = session["username"]
         user = getUserInfo(username)
@@ -227,37 +270,33 @@ def account():
     else:
         return login()
 
-
+# Afficher la page de mise à jour des informations utilisateur et traiter du formulaire de mise à jour
 @app.route("/update", methods=["GET", "POST"])
 def update_account():
-    if "username" in session:
-        username = session["username"]
-        user = getUserInfo(username)
-        update = getUpdateInfo()
-        return render_template("pages/user/update.html", user=user, update=update)
-    else:
+    if "username" not in session:
         return login()
+    
+    username = session["username"]
 
-
-@app.route("/saveUpdateAccount", methods=["POST"])
-def update_account_post():
-    if "username" in session:
-        username = session["username"]
+    # Mis à jour des informations de l'utilisateur
+    if request.method == "POST":
         prenom = request.form["prenom"]
         nom = request.form["nom"]
         id_film = request.form["film"]
         id_genre = request.form["genre"]
         saveUpdateInfo(username, prenom, nom, id_film, id_genre)
         return account()
-    else:
-        return login()
+    
+    user = getUserInfo(username)
+    update = getUpdateInfo()
+    return render_template("pages/user/update.html", user=user, update=update)
 
 
 # -----------------------------------------------------------------------------------------
 # ---------------------------------------- ADMIN ------------------------------------------
 # -----------------------------------------------------------------------------------------
 
-
+# Afficher la page d'administration et traiter des formulaires d'administration
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
     action = request.args.get("action")
@@ -393,21 +432,25 @@ def admin():
     for etu in all_students:
         etu['display'] = f"{etu['prenom']} {etu['nom']} (ID : {etu['id']})"
 
-    return render_template(
-        "pages/user/admin.html",
-        all_students=all_students,
-        students=students,
-        page=page,
-        has_next=has_next,
-        action=action,
-        users=users,
-        edit_user=edit_user,
-        films=films,
-        genres=genres,
-        directors=directors,
-        edit_id=edit_id,
-        edit_student=edit_student,
-        edit_film=edit_film,
-        edit_genre=edit_genre,
-        edit_director=edit_director,
-    )
+    # Si l'utilisateur est admin, afficher la page d'administration
+    if session.get("username") == "admin":
+        return render_template(
+            "pages/user/admin.html",
+            all_students=all_students,
+            students=students,
+            page=page,
+            has_next=has_next,
+            action=action,
+            users=users,
+            edit_user=edit_user,
+            films=films,
+            genres=genres,
+            directors=directors,
+            edit_id=edit_id,
+            edit_student=edit_student,
+            edit_film=edit_film,
+            edit_genre=edit_genre,
+            edit_director=edit_director,
+        )
+    else:
+        return login()
