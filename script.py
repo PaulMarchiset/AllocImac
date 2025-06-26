@@ -261,7 +261,7 @@ def admin():
                     "Un étudiant avec ce prénom, ce nom, ce film préféré et ce genre préféré existe déjà !",
                     "error",
                 )
-                return redirect(url_for("admin", action="add_student"))
+                return redirect(url_for("admin", action="add_student", page=request.args.get("page", 1)))
 
             mycursor.execute(
                 "INSERT INTO ETUDIANT (prenom, nom, id_film, id_genre) VALUES (%s ,%s, %s, %s)",
@@ -269,7 +269,7 @@ def admin():
             )
             mydb.commit()
             flash("Étudiant ajouté !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Modifier un étudiant
         if form_type == "edit_student":
@@ -278,13 +278,27 @@ def admin():
             nom = request.form["nom"]
             id_film = request.form["id_film"]
             id_genre = request.form["id_genre"]
+
+            # Vérifier qu'il n'existe pas déjà un étudiant avec ce prénom, nom, film et genre (autre que celui qu'on modifie)
+            mycursor.execute(
+                "SELECT COUNT(*) AS nb FROM ETUDIANT WHERE prenom=%s AND nom=%s AND id_film=%s AND id_genre=%s AND id!=%s",
+                (prenom, nom, id_film, id_genre, id),
+            )
+            result = mycursor.fetchone()
+            if result["nb"] > 0:
+                flash(
+                    "Un étudiant avec ce prénom, ce nom, ce film préféré et ce genre préféré existe déjà !",
+                    "error",
+                )
+                return redirect(url_for("admin", action="edit_student", id=id, page=request.args.get("page", 1)))
+
             mycursor.execute(
                 "UPDATE ETUDIANT SET prenom=%s, nom=%s, id_film=%s, id_genre=%s WHERE id=%s",
                 (prenom, nom, id_film, id_genre, id),
             )
             mydb.commit()
             flash("Étudiant modifié !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Supprimer un étudiant
         if form_type == "delete_student":
@@ -294,7 +308,7 @@ def admin():
             mycursor.execute("DELETE FROM ETUDIANT WHERE id=%s", (id,))
             mydb.commit()
             flash("Étudiant supprimé !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Ajouter un film
         if form_type == "add_film":
@@ -309,7 +323,7 @@ def admin():
             result = mycursor.fetchone()
             if result["nb"] > 0:
                 flash("Ce film existe déjà !", "error")
-                return redirect(url_for("admin", action="add_film"))
+                return redirect(url_for("admin", action="add_film", page=request.args.get("page", 1)))
 
             # Insérer le film
             mycursor.execute(
@@ -335,7 +349,7 @@ def admin():
                 )
             mydb.commit()
             flash("Film ajouté !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Modifier un film
         if form_type == "edit_film":
@@ -344,6 +358,16 @@ def admin():
             annee = request.form["annee"]
             genres_ids = request.form.getlist("genres")
             directors_ids = request.form.getlist("directors")
+
+            # Vérifier qu'il n'existe pas déjà un film avec ce titre ET cette année (autre que celui qu'on modifie)
+            mycursor.execute(
+                "SELECT COUNT(*) AS nb FROM FILM WHERE LOWER(nom)=LOWER(%s) AND annee=%s AND id!=%s",
+                (nom, annee, id),
+            )
+            result = mycursor.fetchone()
+            if result["nb"] > 0:
+                flash("Ce film existe déjà !", "error")
+                return redirect(url_for("admin", action="edit_film", id=id, page=request.args.get("page", 1)))
 
             mycursor.execute(
                 "UPDATE FILM SET nom=%s, annee=%s WHERE id=%s", (nom, annee, id)
@@ -367,7 +391,7 @@ def admin():
 
             mydb.commit()
             flash("Film modifié !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Supprimer un film
         if form_type == "delete_film":
@@ -382,7 +406,7 @@ def admin():
                     "Impossible de supprimer ce film : il est utilisé par un étudiant.",
                     "error",
                 )
-                return redirect(url_for("admin"))
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
             # Supprimer les liens avec les genres (APPARTENANCE)
             mycursor.execute("DELETE FROM APPARTENANCE WHERE id_film=%s", (id,))
             # Supprimer les liens avec les réalisateurs (DIRECTION)
@@ -391,7 +415,7 @@ def admin():
             mycursor.execute("DELETE FROM FILM WHERE id=%s", (id,))
             mydb.commit()
             flash("Film supprimé !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Ajouter un genre
         if form_type == "add_genre":
@@ -404,21 +428,29 @@ def admin():
             result = mycursor.fetchone()
             if result["nb"] > 0:
                 flash("Ce genre existe déjà !", "error")
-                return redirect(url_for("admin", action="add_genre"))
+                return redirect(url_for("admin", action="add_genre", page=request.args.get("page", 1)))
 
             mycursor.execute("INSERT INTO GENRE (nom) VALUES (%s)", (nom,))
             mydb.commit()
             flash("Genre ajouté !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Modifier un genre
         if form_type == "edit_genre":
             id = request.form["id"]
             nom = request.form["nom"]
+            mycursor.execute(
+                "SELECT COUNT(*) AS nb FROM GENRE WHERE LOWER(nom)=LOWER(%s) AND id!=%s",
+                (nom, id),
+            )
+            result = mycursor.fetchone()
+            if result["nb"] > 0:
+                flash("Ce genre existe déjà !", "error")
+                return redirect(url_for("admin", action="edit_genre", id=id, page=request.args.get("page", 1)))
             mycursor.execute("UPDATE GENRE SET nom=%s WHERE id=%s", (nom, id))
             mydb.commit()
             flash("Genre modifié !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Supprimer un genre
         if form_type == "delete_genre":
@@ -438,11 +470,11 @@ def admin():
                     "Impossible de supprimer ce genre : il est utilisé par un film ou un étudiant.",
                     "error",
                 )
-                return redirect(url_for("admin"))
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
             mycursor.execute("DELETE FROM GENRE WHERE id=%s", (id,))
             mydb.commit()
             flash("Genre supprimé !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Ajouter un réalisateur
         if form_type == "add_director":
@@ -456,21 +488,29 @@ def admin():
             result = mycursor.fetchone()
             if result["nb"] > 0:
                 flash("Ce réalisateur existe déjà !", "error")
-                return redirect(url_for("admin", action="add_director"))
+                return redirect(url_for("admin", action="add_director", page=request.args.get("page", 1)))
 
             mycursor.execute("INSERT INTO REALISATEUR (nom) VALUES (%s)", (nom,))
             mydb.commit()
             flash("Réalisateur ajouté !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Modifier un réalisateur
         if form_type == "edit_director":
             id = request.form["id"]
             nom = request.form["nom"]
+            mycursor.execute(
+                "SELECT COUNT(*) AS nb FROM REALISATEUR WHERE LOWER(nom)=LOWER(%s) AND id!=%s",
+                (nom, id),
+            )
+            result = mycursor.fetchone()
+            if result["nb"] > 0:
+                flash("Ce réalisateur existe déjà !", "error")
+                return redirect(url_for("admin", action="edit_director", id=id, page=request.args.get("page", 1)))
             mycursor.execute("UPDATE REALISATEUR SET nom=%s WHERE id=%s", (nom, id))
             mydb.commit()
             flash("Réalisateur modifié !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
         # Supprimer un réalisateur
         if form_type == "delete_director":
@@ -485,11 +525,11 @@ def admin():
                     "Impossible de supprimer ce réalisateur : il est utilisé par un film.",
                     "error",
                 )
-                return redirect(url_for("admin"))
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
             mycursor.execute("DELETE FROM REALISATEUR WHERE id=%s", (id,))
             mydb.commit()
             flash("Réalisateur supprimé !")
-            return redirect(url_for("admin"))
+            return redirect(url_for("admin", page=request.args.get("page", 1)))
 
     # Pour modification/suppression d'un étudiant
     edit_student = None
@@ -537,15 +577,18 @@ def admin():
     has_next = offset + per_page < total
 
     # Pour les formulaires
-    mycursor.execute("SELECT id, nom FROM FILM")
+    mycursor.execute("SELECT id, nom FROM FILM ORDER BY nom")
     films = mycursor.fetchall()
-    mycursor.execute("SELECT id, nom FROM GENRE")
+    mycursor.execute("SELECT id, nom FROM GENRE ORDER BY nom")
     genres = mycursor.fetchall()
-    mycursor.execute("SELECT id, nom FROM REALISATEUR")
+    mycursor.execute("SELECT id, nom FROM REALISATEUR ORDER BY SUBSTRING_INDEX(nom, ' ', -1), nom")
     directors = mycursor.fetchall()
+    mycursor.execute("SELECT id, prenom, nom FROM ETUDIANT ORDER BY nom, prenom")
+    all_students = mycursor.fetchall()
 
     return render_template(
         "pages/user/admin.html",
+        all_students=all_students,
         students=students,
         page=page,
         has_next=has_next,
