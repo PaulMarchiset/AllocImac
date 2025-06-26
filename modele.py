@@ -308,6 +308,32 @@ def top5Decennies():
         )
     return top_decennies
 
+def getTotalFilmRanking():
+    mycursor.execute("""
+        SELECT 
+            FILM.id AS film_id,
+            FILM.nom AS nom_film,
+            FILM.annee AS annee_film,
+            COUNT(ETUDIANT.id) AS nb_etudiants
+        FROM FILM
+        LEFT JOIN ETUDIANT ON FILM.id = ETUDIANT.id_film
+        GROUP BY FILM.id
+        ORDER BY nb_etudiants DESC
+    """)
+    return mycursor.fetchall()
+
+def getTotalGenreRanking():
+    mycursor.execute(
+        """
+        SELECT GENRE.id AS id_genre, GENRE.nom AS nom_genre, COUNT(ETUDIANT.id) AS nb_etudiants
+        FROM GENRE
+        LEFT JOIN ETUDIANT ON GENRE.id = ETUDIANT.id_genre
+        GROUP BY GENRE.id, GENRE.nom
+        ORDER BY nb_etudiants DESC
+    """
+    )
+    return mycursor.fetchall()
+
 
 # -----------------------------------------------------------------------------------------
 # ------------------------------------ SEARCH QUERY ---------------------------------------
