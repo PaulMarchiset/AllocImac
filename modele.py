@@ -324,9 +324,9 @@ def search_query(q):
     directors = mycursor.fetchall()
 
     student_query = """
-        SELECT * FROM ETUDIANT WHERE prenom LIKE %s OR nom LIKE %s
+        SELECT * FROM ETUDIANT WHERE prenom LIKE %s OR nom LIKE %s OR CONCAT(prenom, ' ', nom) LIKE %s
     """
-    mycursor.execute(student_query, (f"%{q}%", f"%{q}%"))
+    mycursor.execute(student_query, (f"%{q}%", f"%{q}%",f"%{q}%"))
     students = mycursor.fetchall()
 
     return films, directors, students
