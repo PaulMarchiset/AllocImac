@@ -43,6 +43,8 @@ from modele import (
     getAllStudentsShort,
     getStudentsPaginated,
     countStudents,
+    getTotalFilmRanking,
+    getTotalGenreRanking,
     mycursor,
     mydb,
 )
@@ -79,7 +81,29 @@ def students():
 def student(id):
     student = getStudentById(id)
     if student:
-        return render_template("pages/student.html", student=student)
+        film_id = student["film"]["id"]
+        film_ranking=getTotalFilmRanking()
+
+        classement_film = None
+        film_info = None
+        for index, film in enumerate(film_ranking, start=1):
+            if film["film_id"] == film_id:
+                classement_film = index
+                film_info = film
+                break
+
+        genre_id = student["genre"]["id"]
+        genre_ranking = getTotalGenreRanking()
+
+        classement_genre = None
+        genre_info = None
+        for index, genre in enumerate(genre_ranking, start=1):
+            if genre["id_genre"] == genre_id:
+                classement_genre = index
+                genre_info = film
+                break
+
+        return render_template("pages/student.html", student=student, classement_film=classement_film, film_info=film_info, classement_genre=classement_genre, genre_info=genre_info)
     else:
         return "Student not found", 404
 
