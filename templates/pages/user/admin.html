@@ -22,6 +22,12 @@
   <div class="flex flex-col gap-12 items-start mb-8">
     <!-- Colonne des boutons -->
     <div class="flex flex-col gap-2 w-full">
+      <!-- Utilisateur -->
+      <div class="flex flex-row gap-4">
+        <a href="{{ url_for('admin', action='add_user', page=page) }}" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-center min-w-max">Ajouter un utilisateur</a>
+        <a href="{{ url_for('admin', action='edit_user_select', page=page) }}" class="w-full bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600 text-center min-w-max">Modifier un utilisateur</a>
+        <a href="{{ url_for('admin', action='delete_user_select', page=page) }}" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-center min-w-max">Supprimer un utilisateur</a>
+      </div>
       <!-- Étudiant -->
       <div class="flex flex-row gap-4">
         <a href="{{ url_for('admin', action='add_student', page=page) }}" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-center min-w-max">Ajouter un étudiant</a>
@@ -50,9 +56,105 @@
 
     <!-- Colonne du formulaire dynamique -->
     <div class="flex-1 w-full">
+      <!-- Utilisateur -->
+      <!-- Ajouter un utilisateur -->
+      {% if action == "add_user" %}
+        <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
+          <input type="hidden" name="form_type" value="add_user">
+          <input name="username" placeholder="Nom d'utilisateur" required class="border p-2 rounded" />
+          <input name="password" type="password" placeholder="Mot de passe" required class="border p-2 rounded" />
+          <input name="confirm_password" type="password" placeholder="Confirmation du mot de passe" required class="border p-2 rounded" />
+          <label for="id_etudiant">Associer à un étudiant (optionnel) :</label>
+          <select name="id_etudiant" id="id_etudiant" class="border p-2 rounded">
+            <option value="">Aucun</option>
+            {% for etu in all_students %}
+              {% set already_linked = false %}
+                {% for user in users %}
+                  {% if user.id_etudiant == etu.id %}
+                    {% set already_linked = true %}
+                  {% endif %}
+                {% endfor %}
+              <option value="{{ etu.id }}" {% if already_linked %}disabled{% endif %}>{{ etu.display }}{% if already_linked %} (déjà lié){% endif %}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Ajouter un utilisateur</button>
+        </form>
+      <!-- Modifier un utilisateur -->
+      {% elif action == "edit_user_select" %}
+        <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+          <label for="user_id">Choisir un utilisateur à modifier :</label>
+          <select name="id" id="user_id" class="border p-2 rounded" required>
+            <option value="">-- Sélectionner --</option>
+            {% for user in users %}
+              <option value="{{ user.id }}">
+                {{ user.username }}
+                {% if user.id_etudiant %}
+                  [associé à {{ user.prenom }} {{ user.nom }} (ID : {{ user.id_etudiant }})]
+                {% else %}
+                  (non associé à un étudiant)
+                {% endif %}
+              </option>
+            {% endfor %}
+          </select>
+          <input type="hidden" name="action" value="edit_user">
+          <input type="hidden" name="page" value="{{ page }}">
+          <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier un utilisateur</button>
+        </form>
+      {% elif action == "edit_user" and edit_user %}
+        <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
+        <input type="hidden" name="form_type" value="edit_user">
+        <input type="hidden" name="id" value="{{ edit_user.id }}">
+        <input name="username" value="{{ edit_user.username }}" placeholder="Nom d'utilisateur" required class="border p-2 rounded" />
+        <input name="password" type="password" placeholder="Nouveau mot de passe (vide pour ne pas changer)" class="border p-2 rounded" />
+        <input name="confirm_password" type="password" placeholder="Confirmation du mot de passe" class="border p-2 rounded" />
+        <label for="id_etudiant">Associer à un étudiant (optionnel) :</label>
+        <select name="id_etudiant" id="id_etudiant" class="border p-2 rounded">
+          <option value="">Aucun</option>
+          {% for etu in all_students %}
+            {% set already_linked = false %}
+            {% for user in users %}
+              {% if user.id_etudiant == etu.id and user.id != edit_user.id %}
+                {% set already_linked = true %}
+              {% endif %}
+            {% endfor %}
+            <option value="{{ etu.id }}" {% if already_linked %}disabled{% endif %} {% if edit_user.id_etudiant == etu.id %}selected{% endif %}>
+              {{ etu.display }}{% if already_linked %} (déjà lié){% endif %}
+            </option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600">Modifier l'utilisateur</button>
+      </form>
+      <!-- Supprimer un utilisateur -->
+      {% elif action == "delete_user_select" %}
+        <form method="get" class="flex flex-col gap-2 w-full" autocomplete="off">
+          <label for="user_id_del">Choisir un utilisateur à supprimer :</label>
+          <select name="id" id="user_id_del" class="border p-2 rounded" required>
+            <option value="">-- Sélectionner --</option>
+            {% for user in users %}
+              <option value="{{ user.id }}">
+                {{ user.username }}
+                {% if user.id_etudiant %}
+                  [associé à {{ user.prenom }} {{ user.nom }} (ID : {{ user.id_etudiant }})]
+                {% else %}
+                  (non associé à un étudiant)
+                {% endif %}
+              </option>
+            {% endfor %}
+          </select>
+          <input type="hidden" name="action" value="delete_user">
+          <input type="hidden" name="page" value="{{ page }}">
+          <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Supprimer un utilisateur</button>
+        </form>
+      {% elif action == "delete_user" and edit_user %}
+        <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+          <input type="hidden" name="form_type" value="delete_user">
+          <input type="hidden" name="id" value="{{ edit_user.id }}">
+          <p>Supprimer l'utilisateur <strong>{{ edit_user.username }}</strong> ?</p>
+          <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Confirmer la suppression</button>
+        </form>
       <!-- Étudiant -->
       <!-- Ajouter un étudiant -->
-      {% if action == "add_student" %}
+      {% elif action == "add_student" %}
         <form method="post" class="flex flex-col gap-2 max-w-md" autocomplete="off">
           <input type="hidden" name="form_type" value="add_student">
           <input name="prenom" placeholder="Prénom de l'étudiant" required class="border p-2 rounded" />
