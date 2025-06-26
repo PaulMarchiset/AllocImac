@@ -193,7 +193,7 @@ def login():
                     {
                         "success": True,
                         "data": {
-                            "message": "Admin login successful",
+                            "message": "Login successful",
                             "user": {"username": username, "role": "admin"},
                         },
                     }
