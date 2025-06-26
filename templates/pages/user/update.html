@@ -4,7 +4,7 @@
     <h2 class="text-4xl font-bold uppercase">Bonjour {{ session.username }} !</h2>
     <p class=" text-xs font-semibold uppercase" >Vous pouvez modifier vos informations ci-dessous.</p>
   </div>
-  <form action="/saveUpdateAccount" method="post" class="flex flex-col gap-y-4 items-center">
+  <form action="/update" method="post" class="flex flex-col gap-y-4 items-center">
 
       <input type="text" name="prenom" placeholder="Prénom" value="{{ user.prenom }}" class="border border-[#737373] py-4 px-3 rounded-md w-full placeholder:uppercase" required />
 
