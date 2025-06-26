@@ -6,9 +6,7 @@ endblock %} {%block content %}
     <h1 class="text-[1.125rem] uppercase font-semibold">
       Inscrivez-vous en 2 secondes
     </h1>
-    <div class="text-sm text-[#737373]">
-      Et rejoignez une communauté de 7 millions de cinéphiles.
-    </div>
+    <div id="userCount" class="text-sm text-[#737373]">Chargement des cinéphiles...</div>
   </div>
   <form
     action="/signup"
@@ -59,4 +57,19 @@ endblock %} {%block content %}
     Déjà un compte ? <a href="/login" class="text-blue-700">Connectez-vous</a>
   </p>
 </section>
+<script>
+  fetch('/api/user-count')
+    .then(response => response.json())
+    .then(data => {
+      const count = data.total_users.total;
+      // const millions = (count / 1_000_000).toFixed(1);
+      document.getElementById('userCount').innerText = 
+        `Et rejoignez une communauté de ${count} millions de cinéphiles.`;
+    })
+    .catch(error => {
+      console.error('Error fetching user count:', error);
+      document.getElementById('userCount').innerText = 
+        `Rejoignez une communauté de cinéphiles.`;
+    });
+</script>
 {% endblock %}

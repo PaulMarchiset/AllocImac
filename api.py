@@ -8,7 +8,7 @@ import mysql.connector
 from modele import (
     getAllStudents,
     getStudentById,
-    userCount,
+    getUserCount,
     oneFilm,
     oneDirector,
     allGenres,
@@ -46,76 +46,71 @@ def index():
     return render_template("pages/home.html")
 
 
-@app.route("/")
+@app.route("/api/")
 def home():
     return render_template("pages/home.html")
 
 
-@app.route("/students")
+@app.route("/api/students")
 def students():
-    students = getAllStudents()
-    return render_template("pages/students.html", students=students)
+    return jsonify(getAllStudents())
 
 
-@app.route("/student/<int:id>")
+@app.route("/api/student/<int:id>")
 def student(id):
     student = getStudentById(id)
     if student:
-        return render_template("pages/student.html", student=student)
+        return jsonify(student)
     else:
-        return "Student not found", 404
+        return jsonify({"error": "Student not found"}), 404
 
 
-@app.route("/film/<int:id>")
+@app.route("/api/film/<int:id>")
 def film(id):
     film = oneFilm(id)
     if film:
-        return render_template("pages/film.html", film=film)
+        return jsonify(film)
     else:
-        return "Film not found", 404
+        return jsonify({"error": "Film not found"}), 404
 
 
-@app.route("/director/<int:id>")
+@app.route("/api/director/<int:id>")
 def director(id):
     director = oneDirector(id)
     if director:
-        return render_template("pages/director.html", director=director)
+        return jsonify(director)
     else:
-        return "Director not found", 404
+        return jsonify({"error": "Director not found"}), 404
 
 
-@app.route("/genres")
+@app.route("/api/genres")
 def genres():
-    genres = allGenres()
-    return render_template("pages/genres.html", genres=genres)
+    return jsonify(allGenres())
 
 
 # -----------------------------------------------------------------------------------------
 # ---------------------------------------- TOP 5 ------------------------------------------
 # -----------------------------------------------------------------------------------------
 
-@app.route("/top5/films")
+
+@app.route("/api/top5/films")
 def top5_films():
-    films = top5Film()
-    return render_template("pages/top5/films.html", films=films)
+    return jsonify(top5Film())
 
 
-@app.route("/top5/genres")
+@app.route("/api/top5/genres")
 def top5_genres():
-    genres = top5Genre()
-    return render_template("pages/top5/genres.html", genres=genres)
+    return jsonify(top5Genre())
 
 
-@app.route("/top5/directors")
+@app.route("/api/top5/directors")
 def top5_directors():
-    directors = top5Realisateur()
-    return render_template("pages/top5/directors.html", directors=directors)
+    return jsonify(top5Realisateur())
 
 
-@app.route("/top5/decades")
+@app.route("/api/top5/decades")
 def top5_decades():
-    decades = top5Decennies()
-    return render_template("pages/top5/decades.html", decades=decades)
+    return jsonify(top5Decennies())
 
 
 # -----------------------------------------------------------------------------------------
@@ -123,26 +118,9 @@ def top5_decades():
 # -----------------------------------------------------------------------------------------
 
 
-@app.route("/search", methods=["GET"])
-def search():
-    q = request.args.get("search", "").strip()
-    films, directors, students = [], [], []
-
-    if q:
-        films, directors, students = search_query(q)
-
-    return render_template(
-        "pages/search.html",
-        query=q,
-        films=films,
-        directors=directors,
-        students=students,
-    )
-
-
 @app.route("/api/user-count")
-def getUserCount():
-    total = userCount()
+def userCount():
+    total = getUserCount()
     return jsonify({"total_users": total})
 
 
@@ -151,84 +129,107 @@ def getUserCount():
 # -----------------------------------------------------------------------------------------
 
 
-@app.route("/signup", methods=["GET", "POST"])
-def signup_page():
-    if request.method == "POST":
-        result = create_user(
-            request.form["username"],
-            request.form["password"],
-            request.form["confirm-password"],
-        )
-        if result:
-            session["username"] = request.form["username"]
-            return account()
-        else:
-            return render_template(
-                "pages/user/signup.html",
-                message=result,
-            )
-    return render_template("pages/user/signup.html")
+@app.route("/signup", methods=["POST"])
+def signup_api():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    username = data.get("username")
+    password = data.get("password")
+    confirm_password = data.get("confirm_password")
+
+    success, message = create_user(username, password, confirm_password)
+
+    if success:
+        return jsonify({"message": message}), 201
+    else:
+        return jsonify({"error": message}), 400
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["POST"])
 def login():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"success": False, "error": "Invalid data"}), 400
+
+    username = data.get("username")
+    password = data.get("password")
+
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
 
         if username == "admin" and password == "admin":
-            session["username"] = username
-            return admin()
+            return (
+                jsonify(
+                    {
+                        "success": True,
+                        "data": {
+                            "message": "Admin login successful",
+                            "user": {"username": "admin", "role": "admin"},
+                        },
+                    }
+                ),
+                200,
+            )
 
         if verify_user(username, password):
-            session["username"] = username
-            return account()
-        else:
-            return render_template(
-                "pages/user/login.html",
-                message="Nom d'utilisateur ou mot de passe incorrect.",
+            return (
+                jsonify(
+                    {
+                        "success": True,
+                        "data": {
+                            "message": "Admin login successful",
+                            "user": {"username": username, "role": "admin"},
+                        },
+                    }
+                ),
+                200,
             )
-    return render_template("pages/user/login.html")
+
+        return jsonify({"success": False, "error": "Invalid username or password"}), 401
 
 
-@app.route("/logout")
+@app.route("/api/logout")
 def logout():
-    session.pop("username", None)
-    return index()
+    return (
+        jsonify({"message": "Logged out. Please delete your token client-side."}),
+        200,
+    )
 
 
 # -----------------------------------------------------------------------------------------
 # ---------------------------------------- USER -------------------------------------------
 # -----------------------------------------------------------------------------------------
 
-@app.route("/account")
-def account():
-    if "username" in session:
-        username = session["username"]
-        user = getUserInfo(username)
-        return render_template("pages/user/account.html", user=user)
+@app.route("/api/account/<string:username>", methods=["GET"])
+def account_api(username):
+    user_info = getUserInfo(username)
+    if user_info:
+        return jsonify(user_info), 200
     else:
-        return login()
+        return jsonify({"error": "User not found"}), 404
 
 
-@app.route("/update", methods=["GET", "POST"])
-def update_account():
-    if "username" not in session:
-        return login()
+@app.route("/api/update/<string:username>", methods=["PUT"])
+def update_account_api(username):
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
     
-    username = session["username"]
+    prenom = data.get("prenom")
+    nom = data.get("nom")
+    id_film = data.get("id_film")
+    id_genre = data.get("id_genre")
 
-    if request.method == "POST":
-        prenom = request.form["prenom"]
-        nom = request.form["nom"]
-        id_film = request.form["film"]
-        id_genre = request.form["genre"]
-        saveUpdateInfo(username, prenom, nom, id_film, id_genre)
-        return account()
+    if not all([prenom, nom, id_film, id_genre]):
+        return jsonify({"error": "Missing required fields"}), 400
     
-    user = getUserInfo(username)
-    update = getUpdateInfo()
-    return render_template("pages/user/update.html", user=user, update=update)
+    saveUpdateInfo(username, prenom, nom, id_film, id_genre)
+    return jsonify({"message": "Account updated successfully"}), 200
 
 
 # -----------------------------------------------------------------------------------------
@@ -236,7 +237,7 @@ def update_account():
 # -----------------------------------------------------------------------------------------
 
 
-@app.route("/admin", methods=["GET", "POST"])
+@app.route("/api/admin", methods=["GET", "POST"])
 def admin():
     action = request.args.get("action")
     edit_id = request.args.get("id", type=int)
@@ -632,22 +633,19 @@ def admin():
     mycursor.execute("SELECT id, prenom, nom FROM ETUDIANT ORDER BY nom, prenom")
     all_students = mycursor.fetchall()
 
-    if session.get("username") == "admin":
-        return render_template(
-            "pages/user/admin.html",
-            all_students=all_students,
-            students=students,
-            page=page,
-            has_next=has_next,
-            action=action,
-            films=films,
-            genres=genres,
-            directors=directors,
-            edit_id=edit_id,
-            edit_student=edit_student,
-            edit_film=edit_film,
-            edit_genre=edit_genre,
-            edit_director=edit_director,
-        )
-    else:
-        return login()
+    return jsonify(
+        {
+            "students": all_students,
+            "page": page,
+            "has_next": has_next,
+            "action": action,
+            "films": films,
+            "genres": genres,
+            "directors": directors,
+            "edit_id": edit_id,
+            "edit_student": edit_student,
+            "edit_film": edit_film,
+            "edit_genre": edit_genre,
+            "edit_director": edit_director,
+        }
+    )

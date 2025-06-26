@@ -53,6 +53,10 @@ def getStudentById(id):
         }
     return None
 
+def userCount():
+    mycursor.execute("SELECT COUNT(id) AS total FROM utilisateur")
+    result = mycursor.fetchone()
+    return result if result else 0
 
 # -----------------------------------------------------------------------------------------
 # ------------------------------------- GET FILM ------------------------------------------
@@ -370,13 +374,13 @@ def create_user(username, password, confirm_password):
     confirm_password = confirm_password.strip()
 
     if not username or not password or not confirm_password:
-        return "Username and password cannot be empty."
+        return False, "Username and password cannot be empty."
 
     if password != confirm_password:
-        return "Passwords do not match."
+        return False, "Passwords do not match."
 
     if not is_strong_password(password):
-        return (
+        return (False, 
             "Le mot de passe doit contenir au moins 8 caractères, "
             "une majuscule, une minuscule, un chiffre et un symbole."
         )
@@ -385,7 +389,7 @@ def create_user(username, password, confirm_password):
         # Check if username already exists
         mycursor.execute("SELECT 1 FROM UTILISATEUR WHERE username = %s", (username,))
         if mycursor.fetchone():
-            return "Username already exists."
+            return False, "Username already exists."
 
         # Create user
         hashed_pw = generate_password_hash(password)
@@ -394,11 +398,11 @@ def create_user(username, password, confirm_password):
             (username, hashed_pw),
         )
         mydb.commit()
-        return "success"
+        return True, "success"
 
     except Exception:
-        return "An error occurred. Please try again later."
-
+        return False, "An error occurred. Please try again later."
+    
 
 def verify_user(username, password):
     mycursor.execute(
@@ -416,6 +420,7 @@ def getUserInfo(username):
     mycursor.execute(
         """
         SELECT 
+            u.username AS username,
             e.prenom AS etu_prenom,
             e.nom AS etu_nom, 
             f.nom AS film_nom,
@@ -433,6 +438,7 @@ def getUserInfo(username):
     result = mycursor.fetchone()
     if result:
         return {
+            "username": result["username"],
             "prenom": result["etu_prenom"],
             "nom": result["etu_nom"],
             "film": {"nom": result["film_nom"], "id": result["film_id"]},
@@ -468,7 +474,7 @@ def saveUpdateInfo(username, prenom, nom, id_film, id_genre):
         mycursor.execute(
             """UPDATE UTILISATEUR SET id_etudiant = %s WHERE username = %s""",
             (etudiant_id, username),
-        )
+        )      
     else:
         etudiant_id = user["id_etudiant"]
         mycursor.execute(

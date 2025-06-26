@@ -4,14 +4,14 @@
     <h2 class="text-black text-4xl font-bold">Bonjour {{ user.prenom }} !</h2>
     <p class="text-black text-lg">Vous pouvez modifier vos informations ci-dessous.</p>
   </div>
-  <form action="/saveUpdateAccount" method="post" class="flex flex-col gap-6 w-1/2">
+  <form action="/update" method="post" class="flex flex-col gap-6 w-1/2">
     <label class="flex flex-col text-black font-semibold">
-      Prénom:
+      Prénom :
       <input type="text" name="prenom" value="{{ user.prenom }}" class="p-2 rounded" required />
     </label>
 
     <label class="flex flex-col text-black font-semibold">
-      Nom:
+      Nom :
       <input type="text" name="nom" value="{{ user.nom }}" class="p-2 rounded" required />
     </label>
 
