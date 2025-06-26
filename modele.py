@@ -775,7 +775,7 @@ def getDirectorById(id):
 
 
 def getAllFilms():
-    mycursor.execute("SELECT id, nom FROM FILM ORDER BY nom")
+    mycursor.execute("SELECT id, nom, annee FROM FILM ORDER BY nom")
     return mycursor.fetchall()
 
 
