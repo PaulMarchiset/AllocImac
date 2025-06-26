@@ -51,18 +51,8 @@ app.secret_key = "key"
 # -----------------------------------------------------------------------------------------
 
 
-def index():
-    return render_template("pages/home.html")
-
-
-@app.route("/api/")
-def home():
-    return render_template("pages/home.html")
-
-
 @app.route("/api/students")
 def students():
-
     return jsonify(getAllStudents())
 
 

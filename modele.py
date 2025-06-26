@@ -898,10 +898,11 @@ def getAllStudentsShort():
 def getStudentsPaginated(offset=0, limit=10):
     mycursor.execute(
         """
-        SELECT e.id, e.prenom, e.nom, f.nom AS film_nom, g.nom AS genre_nom
+        SELECT e.id, e.prenom, e.nom, u.username AS username, f.nom AS film_nom, g.nom AS genre_nom
         FROM ETUDIANT e
         JOIN FILM f ON e.id_film = f.id
         JOIN GENRE g ON e.id_genre = g.id
+        LEFT JOIN UTILISATEUR u ON e.id = u.id_etudiant
         ORDER BY e.id
         LIMIT %s OFFSET %s
     """,
