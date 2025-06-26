@@ -43,9 +43,7 @@ from modele import (
     getAllDirectors,
     getAllStudentsShort,
     getStudentsPaginated,
-    countStudents,
-    mycursor,
-    mydb,
+    countStudents
 )
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
@@ -160,7 +158,7 @@ def search():
 
 
 @app.route("/api/user-count")
-def getUserCount():
+def userCount_api():
     total = userCount()
     return jsonify({"total_users": total})
 
