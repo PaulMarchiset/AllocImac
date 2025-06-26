@@ -15,34 +15,28 @@ from modele import (
     top5Genre,
     top5Film,
     top5Realisateur,
-    search_query,
     create_user,
     verify_user,
     getUserInfo,
-    getUpdateInfo,
     saveUpdateInfo,
-    addStudent,
-    editStudent,
-    deleteStudent,
-    addFilm,
-    editFilm,
-    deleteFilm,
-    addGenre,
-    editGenre,
-    deleteGenre,
-    addDirector,
-    editDirector,
-    deleteDirector,
-    getStudentByIdFull,
-    getFilmByIdWithLinks,
-    getGenreById,
-    getDirectorById,
-    getAllFilms,
-    getAllGenres,
-    getAllDirectors,
     getAllStudentsShort,
     getStudentsPaginated,
     countStudents,
+    addStudent,
+    editStudent,
+    deleteStudent,
+    getAllFilms,
+    addFilm,
+    editFilm,
+    deleteFilm,
+    getAllGenres,
+    addGenre,
+    editGenre,
+    deleteGenre,
+    getAllDirectors,
+    addDirector,
+    editDirector,
+    deleteDirector,
 )
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
@@ -69,6 +63,7 @@ def home():
 
 @app.route("/api/students")
 def students():
+    
     return jsonify(getAllStudents())
 
 
@@ -254,150 +249,211 @@ def update_account_api(username):
 # -----------------------------------------------------------------------------------------
 
 
-@app.route("/api/admin", methods=["GET", "POST"])
-def admin():
-    action = request.args.get("action")
-    edit_id = request.args.get("id", type=int)
+# STUDENTS API
+@app.route("/api/admin/students", methods=["GET"])
+def get_students_api():
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
 
-    # Traitement des formulaires POST
-    if request.method == "POST":
-        form_type = request.form.get("form_type")
-
-        # Ajouter un étudiant
-        if form_type == "add_student":
-            prenom = request.form["prenom"]
-            nom = request.form["nom"]
-            id_film = request.form["id_film"]
-            id_genre = request.form["id_genre"]
-            addStudent(prenom, nom, id_film, id_genre)
-
-        # Modifier un étudiant
-        if form_type == "edit_student":
-            id = request.form["id"]
-            prenom = request.form["prenom"]
-            nom = request.form["nom"]
-            id_film = request.form["id_film"]
-            id_genre = request.form["id_genre"]
-            editStudent(id, prenom, nom, id_film, id_genre)
-
-        # Supprimer un étudiant
-        if form_type == "delete_student":
-            id = request.form["id"]
-            deleteStudent(id)
-
-        # Ajouter un film
-        if form_type == "add_film":
-            nom = request.form["nom"]
-            annee = request.form["annee"]
-            addFilm(nom, annee)
-
-        # Modifier un film
-        if form_type == "edit_film":
-            id = request.form["id"]
-            nom = request.form["nom"]
-            annee = request.form["annee"]
-            genres_ids = request.form.getlist("genres")
-            directors_ids = request.form.getlist("directors")
-            editFilm(id, nom, annee, genres_ids, directors_ids)
-
-        # Supprimer un film
-        if form_type == "delete_film":
-            id = request.form["id"]
-            deleteFilm(id)
-
-        # Ajouter un genre
-        if form_type == "add_genre":
-            nom = request.form["nom"]
-            addGenre(nom)
-
-        # Modifier un genre
-        if form_type == "edit_genre":
-            id = request.form["id"]
-            nom = request.form["nom"]
-            editGenre(id, nom)
-
-        # Supprimer un genre
-        if form_type == "delete_genre":
-            id = request.form["id"]
-            deleteGenre(id)
-
-        # Ajouter un réalisateur
-        if form_type == "add_director":
-            nom = request.form["nom"]
-            addDirector(nom)
-
-        # Modifier un réalisateur
-        if form_type == "edit_director":
-            id = request.form["id"]
-            nom = request.form["nom"]
-            editDirector(id, nom)
-
-        # Supprimer un réalisateur
-        if form_type == "delete_director":
-            id = request.form["id"]
-            deleteDirector(id)
-
-    # Pour modification/suppression d'un étudiant
-    edit_student = (
-        getStudentByIdFull(edit_id)
-        if action in ["edit_student", "delete_student"] and edit_id
-        else None
-    )
-
-    # Pour modification/suppression d'un film
-    edit_film = (
-        getFilmByIdWithLinks(edit_id)
-        if action in ["edit_film", "delete_film"] and edit_id
-        else None
-    )
-
-    # Pour modification/suppression d'un genre
-    edit_genre = (
-        getGenreById(edit_id)
-        if action in ["edit_genre", "delete_genre"] and edit_id
-        else None
-    )
-
-    # Pour modification/suppression d'un réalisateur
-    edit_director = (
-        getDirectorById(edit_id)
-        if action in ["edit_director", "delete_director"] and edit_id
-        else None
-    )
-
-    # Pagination
     page = request.args.get("page", 1, type=int)
-    per_page = 10
-    offset = (page - 1) * per_page
-    students = getStudentsPaginated(offset=offset, limit=per_page)
+    limit = request.args.get("limit", 10, type=int)
+    offset = (page - 1) * limit
+
+    students = getStudentsPaginated(offset=offset, limit=limit)
     total = countStudents()
-    has_next = offset + per_page < total
 
-    # Pour les formulaires
+    return jsonify({
+        "students": students,
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total": total,
+            "has_next": offset + limit < total
+        }
+    }), 200
+
+
+@app.route("/api/admin/students", methods=["POST"])
+def add_student_api():
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+    
+    prenom = data.get("prenom")
+    nom = data.get("nom")
+    id_film = data.get("id_film")
+    id_genre = data.get("id_genre")
+
+    if not all([prenom, nom, id_film, id_genre]):
+        return jsonify({"error": "Missing required fields"}), 400
+    addStudent(prenom, nom, id_film, id_genre)
+    return jsonify({"message": "Student added successfully"}), 201
+
+@app.route("/api/admin/students/<int:id>", methods=["PUT"])
+def edit_student_api(id):
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    prenom = data.get("prenom")
+    nom = data.get("nom")
+    id_film = data.get("id_film")
+    id_genre = data.get("id_genre")
+
+    if not all([prenom, nom, id_film, id_genre]):
+        return jsonify({"error": "Missing required fields"}), 400
+    editStudent(id, prenom, nom, id_film, id_genre)
+    return jsonify({"message": "Student updated successfully"}), 200
+
+@app.route("/api/admin/students/<int:id>", methods=["DELETE"])
+def delete_student_api(id):
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    deleteStudent(id)
+    return jsonify({"message": "Student deleted successfully"}), 200
+
+
+# FILMS API
+@app.route("/api/admin/films", methods=["GET"])
+def get_films_api():
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
     films = getAllFilms()
+    return jsonify(films), 200
+
+@app.route("/api/admin/film", methods=["POST"])
+def add_film_api():
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+    
+    nom = data.get("nom")
+    annee = data.get("annee")
+    genres_ids = data.get("genres", [])
+    directors_ids = data.get("directors", [])
+
+    if not all([nom, annee, genres_ids, directors_ids]):
+        return jsonify({"error": "Missing required fields"}), 400
+    addFilm(nom, annee, genres_ids, directors_ids)
+    return jsonify({"message": "Film added successfully"}), 201
+
+@app.route("/api/admin/film/<int:id>", methods=["PUT"])
+def edit_film_api(id):
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    nom = data.get("nom")
+    annee = data.get("annee")
+    genres_ids = data.get("genres", [])
+    directors_ids = data.get("directors", [])
+
+    if not all([nom, annee, genres_ids, directors_ids]):
+        return jsonify({"error": "Missing required fields"}), 400
+    editFilm(id, nom, annee, genres_ids, directors_ids)
+    return jsonify({"message": "film updated successfully"}), 200
+
+@app.route("/api/admin/film/<int:id>", methods=["DELETE"])
+def delete_film_api(id):
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    deleteFilm(id)
+    return jsonify({"message": "Film deleted successfully"}), 200
+
+# GENRES API
+@app.route("/api/admin/genres", methods=["GET"])
+def get_genres_api():
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
     genres = getAllGenres()
+    return jsonify(genres), 200
+
+@app.route("/api/admin/genre", methods=["POST"])
+def add_genre_api():
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+    
+    nom = data.get("nom")
+
+    if not nom:
+        return jsonify({"error": "Missing required fields"}), 400
+    addGenre(nom)
+    return jsonify({"message": "Genre added successfully"}), 201
+
+@app.route("/api/admin/genre/<int:id>", methods=["PUT"])
+def edit_genre_api(id):
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    nom = data.get("nom")
+
+    if not nom:
+        return jsonify({"error": "Missing required fields"}), 400
+    editGenre(id, nom)
+    return jsonify({"message": "genre updated successfully"}), 200
+
+@app.route("/api/admin/genre/<int:id>", methods=["DELETE"])
+def delete_genre_api(id):
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    deleteGenre(id)
+    return jsonify({"message": "Genre deleted successfully"}), 200
+
+# DIRECTORS API
+@app.route("/api/admin/directors", methods=["GET"])
+def get_directors_api():
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
     directors = getAllDirectors()
-    all_students = getAllStudentsShort()
+    return jsonify(directors), 200
 
-    for etu in all_students:
-        etu["display"] = f"{etu['prenom']} {etu['nom']} (ID : {etu['id']})"
+@app.route("/api/admin/director", methods=["POST"])
+def add_director_api():
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+    
+    nom = data.get("nom")
 
-    if session.get("username") == "admin":
-        return render_template(
-            "pages/user/admin.html",
-            all_students=all_students,
-            students=students,
-            page=page,
-            has_next=has_next,
-            action=action,
-            films=films,
-            genres=genres,
-            directors=directors,
-            edit_id=edit_id,
-            edit_student=edit_student,
-            edit_film=edit_film,
-            edit_genre=edit_genre,
-            edit_director=edit_director,
-        )
-    else:
-        return login()
+    if not nom:
+        return jsonify({"error": "Missing required fields"}), 400
+    addDirector(nom)
+    return jsonify({"message": "Director added successfully"}), 201
+
+@app.route("/api/admin/director/<int:id>", methods=["PUT"])
+def edit_director_api(id):
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    nom = data.get("nom")
+
+    if not nom:
+        return jsonify({"error": "Missing required fields"}), 400
+    editDirector(id, nom)
+    return jsonify({"message": "Director updated successfully"}), 200
+
+@app.route("/api/admin/director/<int:id>", methods=["DELETE"])
+def delete_director_api(id):
+    if session.get("username") != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+    deleteDirector(id)
+    return jsonify({"message": "Director deleted successfully"}), 200
