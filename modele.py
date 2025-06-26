@@ -465,6 +465,88 @@ def saveUpdateInfo(username, prenom, nom, id_film, id_genre):
 # -----------------------------------------------------------------------------------------
 
 
+def getAllUsers():
+    mycursor.execute("""
+        SELECT u.id, u.username, u.id_etudiant, e.prenom, e.nom
+        FROM UTILISATEUR u
+        LEFT JOIN ETUDIANT e ON u.id_etudiant = e.id
+        ORDER BY u.username
+    """)
+    return mycursor.fetchall()
+
+
+def getUserById(id):
+    mycursor.execute("""
+        SELECT u.id, u.username, u.id_etudiant, e.prenom, e.nom
+        FROM UTILISATEUR u
+        LEFT JOIN ETUDIANT e ON u.id_etudiant = e.id
+        WHERE u.id = %s
+    """, (id,))
+    return mycursor.fetchone()
+
+
+def addUser(username, password, confirm_password, id_etudiant):
+    # Vérifier que le nom d'utilsateur n'existe pas déjà
+    mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE username=%s", (username,))
+    if mycursor.fetchone()["nb"] > 0:
+        flash("Ce nom d'utilisateur existe déjà !", "error")
+        return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
+
+    # Vérifier la force du mot de passe
+    if not is_strong_password(password):
+        flash("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un symbole.", "error")
+        return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
+
+    # Vérifier la confirmation du mot de passe
+    if password != confirm_password:
+        flash("Les mots de passe ne correspondent pas.", "error")
+        return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
+
+    # Vérifier qu'aucun utilisateur n'est déjà lié à cet étudiant
+    if id_etudiant:
+        mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE id_etudiant=%s", (id_etudiant,))
+        if mycursor.fetchone()["nb"] > 0:
+            flash("Cet étudiant a déjà un compte utilisateur !", "error")
+            return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
+
+    hashed_pw = generate_password_hash(password)
+    mycursor.execute(
+        "INSERT INTO UTILISATEUR (username, password, id_etudiant) VALUES (%s, %s, %s)",
+        (username, hashed_pw, id_etudiant if id_etudiant else None)
+    )
+    mydb.commit()
+    flash("Utilisateur ajouté !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
+
+
+def editUser(id, username, password, id_etudiant):
+    mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE username=%s AND id!=%s", (username, id))
+    if mycursor.fetchone()["nb"] > 0:
+        flash("Ce nom d'utilisateur existe déjà !", "error")
+        return redirect(url_for("admin", action="edit_user", page=request.args.get("page", 1)))
+    if password:
+        hashed_pw = generate_password_hash(password)
+        mycursor.execute(
+            "UPDATE UTILISATEUR SET username=%s, password=%s, id_etudiant=%s WHERE id=%s",
+            (username, hashed_pw, id_etudiant if id_etudiant else None, id)
+        )
+    else:
+        mycursor.execute(
+            "UPDATE UTILISATEUR SET username=%s, id_etudiant=%s WHERE id=%s",
+            (username, id_etudiant if id_etudiant else None, id)
+        )
+    mydb.commit()
+    flash("Utilisateur modifié !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
+
+
+def deleteUser(id):
+    mycursor.execute("DELETE FROM UTILISATEUR WHERE id=%s", (id,))
+    mydb.commit()
+    flash("Utilisateur supprimé !")
+    return redirect(url_for("admin", page=request.args.get("page", 1)))
+
+
 def addStudent(prenom, nom, id_film, id_genre):
     mycursor.execute(
         "SELECT COUNT(*) AS nb FROM ETUDIANT WHERE prenom=%s AND nom=%s AND id_film=%s AND id_genre=%s",

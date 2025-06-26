@@ -21,6 +21,9 @@ from modele import (
     getUserInfo,
     getUpdateInfo,
     saveUpdateInfo,
+    addUser,
+    editUser,
+    deleteUser,
     addStudent,
     editStudent,
     deleteStudent,
@@ -41,10 +44,10 @@ from modele import (
     getAllGenres,
     getAllDirectors,
     getAllStudentsShort,
+    getAllUsers,
+    getUserById,
     getStudentsPaginated,
     countStudents,
-    mycursor,
-    mydb,
 )
 
 from flask import Flask, render_template, request
@@ -264,6 +267,27 @@ def admin():
     if request.method == "POST":
         form_type = request.form.get("form_type")
         
+        # Ajouter un utilisateur
+        if form_type == "add_user":
+            username = request.form["username"]
+            password = request.form["password"]
+            confirm_password = request.form["confirm_password"]
+            id_etudiant = request.form.get("id_etudiant") or None
+            addUser(username, password, confirm_password, id_etudiant)
+
+        # Modifier un utilisateur
+        if form_type == "edit_user":
+            id = request.form["id"]
+            username = request.form["username"]
+            password = request.form["password"]  # Peut être vide si pas de changement
+            id_etudiant = request.form.get("id_etudiant") or None
+            editUser(id, username, password, id_etudiant)
+
+        # Supprimer un utilisateur
+        if form_type == "delete_user":
+            id = request.form["id"]
+            deleteUser(id)
+
         # Ajouter un étudiant
         if form_type == "add_student":
             prenom = request.form["prenom"]
@@ -359,6 +383,8 @@ def admin():
     has_next = offset + per_page < total
 
     # Pour les formulaires
+    users = getAllUsers()
+    edit_user = getUserById(edit_id) if action in ["edit_user", "delete_user"] and edit_id else None
     films = getAllFilms()
     genres = getAllGenres()
     directors = getAllDirectors()
@@ -374,6 +400,8 @@ def admin():
         page=page,
         has_next=has_next,
         action=action,
+        users=users,
+        edit_user=edit_user,
         films=films,
         genres=genres,
         directors=directors,
