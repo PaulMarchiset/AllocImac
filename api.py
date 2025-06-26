@@ -4,7 +4,7 @@
 
 import mysql.connector
 
-from modele import (
+from modele_api import (
     getAllStudents,
     getStudentById,
     userCount,
@@ -19,7 +19,6 @@ from modele import (
     verify_user,
     getUserInfo,
     saveUpdateInfo,
-    getAllStudentsShort,
     getStudentsPaginated,
     countStudents,
     addStudent,
