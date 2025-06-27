@@ -8,8 +8,6 @@ import mysql.connector
 
 import re
 
-from flask import request, redirect, url_for, flash
-
 mydb = mysql.connector.connect(
     host="localhost", user="root", password="admin", database="allocimac"
 )
@@ -521,25 +519,21 @@ def addUser(username, password, confirm_password, id_etudiant):
     # Vérifier que le nom d'utilsateur n'existe pas déjà
     mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE username=%s", (username,))
     if mycursor.fetchone()["nb"] > 0:
-        flash("Ce nom d'utilisateur existe déjà !", "error")
-        return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
+        return False, "Ce nom d'utilisateur existe déjà !"
 
     # Vérifier la force du mot de passe
     if not is_strong_password(password):
-        flash("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un symbole.", "error")
-        return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
+        return False, "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un symbole."
 
     # Vérifier la confirmation du mot de passe
     if password != confirm_password:
-        flash("Les mots de passe ne correspondent pas.", "error")
-        return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
+        return False, "Les mots de passe ne correspondent pas."
 
     # Vérifier qu'aucun utilisateur n'est déjà lié à cet étudiant
     if id_etudiant:
         mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE id_etudiant=%s", (id_etudiant,))
         if mycursor.fetchone()["nb"] > 0:
-            flash("Cet étudiant a déjà un compte utilisateur !", "error")
-            return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
+            return False, "Cet étudiant a déjà un compte utilisateur !"
 
     hashed_pw = generate_password_hash(password)
     mycursor.execute(
@@ -547,29 +541,26 @@ def addUser(username, password, confirm_password, id_etudiant):
         (username, hashed_pw, id_etudiant if id_etudiant else None)
     )
     mydb.commit()
-    flash("Utilisateur ajouté !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Utilisateur ajouté !"
 
 
 def editUser(id, username, password, confirm_password, id_etudiant):
     mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE username=%s AND id!=%s", (username, id))
     if mycursor.fetchone()["nb"] > 0:
-        flash("Ce nom d'utilisateur existe déjà !", "error")
-        return redirect(url_for("admin", action="edit_user", page=request.args.get("page", 1)))
+        return False, "Ce nom d'utilisateur existe déjà !"
+    
     # Vérifier qu'aucun autre utilisateur n'est déjà lié à cet étudiant
     if id_etudiant:
         mycursor.execute("SELECT COUNT(*) AS nb FROM UTILISATEUR WHERE id_etudiant=%s AND id!=%s", (id_etudiant, id))
         if mycursor.fetchone()["nb"] > 0:
-            flash("Cet étudiant a déjà un compte utilisateur !", "error")
-            return redirect(url_for("admin", action="edit_user", id=id, page=request.args.get("page", 1)))
+            return False, "Cet étudiant a déjà un compte utilisateur !"
+        
     # Si mot de passe fourni, vérifier la force et la confirmation
     if password:
         if not is_strong_password(password):
-            flash("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un symbole.", "error")
-            return redirect(url_for("admin", action="edit_user", id=id, page=request.args.get("page", 1)))
+            return False, "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un symbole."
         if password != confirm_password:
-            flash("Les mots de passe ne correspondent pas.", "error")
-            return redirect(url_for("admin", action="edit_user", id=id, page=request.args.get("page", 1)))
+            return False, "Les mots de passe ne correspondent pas."
         hashed_pw = generate_password_hash(password)
         mycursor.execute(
             "UPDATE UTILISATEUR SET username=%s, password=%s, id_etudiant=%s WHERE id=%s",
@@ -581,15 +572,13 @@ def editUser(id, username, password, confirm_password, id_etudiant):
             (username, id_etudiant if id_etudiant else None, id)
         )
     mydb.commit()
-    flash("Utilisateur modifié !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Utilisateur modifié !"
 
 
 def deleteUser(id):
     mycursor.execute("DELETE FROM UTILISATEUR WHERE id=%s", (id,))
     mydb.commit()
-    flash("Utilisateur supprimé !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Utilisateur supprimé !"
 
 
 def addStudent(prenom, nom, id_film, id_genre):
@@ -597,21 +586,14 @@ def addStudent(prenom, nom, id_film, id_genre):
         "SELECT COUNT(*) AS nb FROM ETUDIANT WHERE prenom=%s AND nom=%s AND id_film=%s AND id_genre=%s",
         (prenom, nom, id_film, id_genre),
     )
-    result = mycursor.fetchone()
-    if result["nb"] > 0:
-        flash(
-            "Un étudiant avec ce prénom, ce nom, ce film préféré et ce genre préféré existe déjà !",
-            "error",
-        )
-        return redirect(url_for("admin", action="add_student", page=request.args.get("page", 1)))
-
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Un étudiant avec ce prénom, ce nom, ce film préféré et ce genre préféré existe déjà !"
     mycursor.execute(
         "INSERT INTO ETUDIANT (prenom, nom, id_film, id_genre) VALUES (%s ,%s, %s, %s)",
         (prenom, nom, id_film, id_genre),
     )
     mydb.commit()
-    flash("Étudiant ajouté !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Étudiant ajouté !"
 
 
 def editStudent(id, prenom, nom, id_film, id_genre):
@@ -620,21 +602,14 @@ def editStudent(id, prenom, nom, id_film, id_genre):
         "SELECT COUNT(*) AS nb FROM ETUDIANT WHERE prenom=%s AND nom=%s AND id_film=%s AND id_genre=%s AND id!=%s",
         (prenom, nom, id_film, id_genre, id),
     )
-    result = mycursor.fetchone()
-    if result["nb"] > 0:
-        flash(
-            "Un étudiant avec ce prénom, ce nom, ce film préféré et ce genre préféré existe déjà !",
-            "error",
-        )
-        return redirect(url_for("admin", action="edit_student", id=id, page=request.args.get("page", 1)))
-
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Un étudiant avec ce prénom, ce nom, ce film préféré et ce genre préféré existe déjà !"
     mycursor.execute(
         "UPDATE ETUDIANT SET prenom=%s, nom=%s, id_film=%s, id_genre=%s WHERE id=%s",
         (prenom, nom, id_film, id_genre, id),
     )
     mydb.commit()
-    flash("Étudiant modifié !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Étudiant modifié !"
 
 
 def deleteStudent(id):
@@ -642,30 +617,23 @@ def deleteStudent(id):
     mydb.commit()
     mycursor.execute("DELETE FROM ETUDIANT WHERE id=%s", (id,))
     mydb.commit()
-    flash("Étudiant supprimé !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Étudiant supprimé !"
 
 
-def addFilm(nom, annee):
+def addFilm(nom, annee, genres_ids, directors_ids):
     # Vérifier si le film existe déjà (même nom et année)
     mycursor.execute(
         "SELECT COUNT(*) AS nb FROM FILM WHERE LOWER(nom)=LOWER(%s) AND annee=%s",
         (nom, annee),
     )
-    result = mycursor.fetchone()
-    if result["nb"] > 0:
-        flash("Ce film existe déjà !", "error")
-        return redirect(url_for("admin", action="add_film", page=request.args.get("page", 1)))
-
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Ce film existe déjà !"
+    
     # Insérer le film
     mycursor.execute(
         "INSERT INTO FILM (nom, annee) VALUES (%s, %s)", (nom, annee)
     )
     film_id = mycursor.lastrowid
-
-    # Récupérer les genres et réalisateurs sélectionnés
-    genres_ids = request.form.getlist("genres")
-    directors_ids = request.form.getlist("directors")
 
     # Insérer dans APPARTENANCE (film-genre)
     for genre_id in genres_ids:
@@ -680,8 +648,7 @@ def addFilm(nom, annee):
             (film_id, director_id),
         )
     mydb.commit()
-    flash("Film ajouté !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Film ajouté !"
 
 
 def editFilm(id, nom, annee, genres_ids, directors_ids):
@@ -690,11 +657,8 @@ def editFilm(id, nom, annee, genres_ids, directors_ids):
         "SELECT COUNT(*) AS nb FROM FILM WHERE LOWER(nom)=LOWER(%s) AND annee=%s AND id!=%s",
         (nom, annee, id),
     )
-    result = mycursor.fetchone()
-    if result["nb"] > 0:
-        flash("Ce film existe déjà !", "error")
-        return redirect(url_for("admin", action="edit_film", id=id, page=request.args.get("page", 1)))
-
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Ce film existe déjà !"
     mycursor.execute(
         "UPDATE FILM SET nom=%s, annee=%s WHERE id=%s", (nom, annee, id)
     )
@@ -706,7 +670,7 @@ def editFilm(id, nom, annee, genres_ids, directors_ids):
             "INSERT INTO APPARTENANCE (id_film, id_genre) VALUES (%s, %s)",
             (id, genre_id),
         )
-
+    
     # Mettre à jour les réalisateurs associés
     mycursor.execute("DELETE FROM DIRECTION WHERE id_film=%s", (id,))
     for director_id in directors_ids:
@@ -714,10 +678,8 @@ def editFilm(id, nom, annee, genres_ids, directors_ids):
             "INSERT INTO DIRECTION (id_film, id_realisateur) VALUES (%s, %s)",
             (id, director_id),
         )
-
     mydb.commit()
-    flash("Film modifié !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Film modifié !"
 
 
 def deleteFilm(id):
@@ -725,13 +687,8 @@ def deleteFilm(id):
     mycursor.execute(
         "SELECT COUNT(*) AS nb FROM ETUDIANT WHERE id_film=%s", (id,)
     )
-    used_by_student = mycursor.fetchone()["nb"]
-    if used_by_student > 0:
-        flash(
-            "Impossible de supprimer ce film : il est utilisé par un étudiant.",
-            "error",
-        )
-        return redirect(url_for("admin", page=request.args.get("page", 1)))
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Impossible de supprimer ce film : il est utilisé par un étudiant."
     # Supprimer les liens avec les genres (APPARTENANCE)
     mycursor.execute("DELETE FROM APPARTENANCE WHERE id_film=%s", (id,))
     # Supprimer les liens avec les réalisateurs (DIRECTION)
@@ -739,8 +696,7 @@ def deleteFilm(id):
     # Supprimer le film
     mycursor.execute("DELETE FROM FILM WHERE id=%s", (id,))
     mydb.commit()
-    flash("Film supprimé !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Film supprimé !"
 
 
 def addGenre(nom):
@@ -748,15 +704,11 @@ def addGenre(nom):
     mycursor.execute(
         "SELECT COUNT(*) AS nb FROM GENRE WHERE LOWER(nom)=LOWER(%s)", (nom,)
     )
-    result = mycursor.fetchone()
-    if result["nb"] > 0:
-        flash("Ce genre existe déjà !", "error")
-        return redirect(url_for("admin", action="add_genre", page=request.args.get("page", 1)))
-
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Ce genre existe déjà !"
     mycursor.execute("INSERT INTO GENRE (nom) VALUES (%s)", (nom,))
     mydb.commit()
-    flash("Genre ajouté !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Genre ajouté !"
 
 
 def editGenre(id, nom):
@@ -764,14 +716,11 @@ def editGenre(id, nom):
         "SELECT COUNT(*) AS nb FROM GENRE WHERE LOWER(nom)=LOWER(%s) AND id!=%s",
         (nom, id),
     )
-    result = mycursor.fetchone()
-    if result["nb"] > 0:
-        flash("Ce genre existe déjà !", "error")
-        return redirect(url_for("admin", action="edit_genre", id=id, page=request.args.get("page", 1)))
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Ce genre existe déjà !"
     mycursor.execute("UPDATE GENRE SET nom=%s WHERE id=%s", (nom, id))
     mydb.commit()
-    flash("Genre modifié !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Genre modifié !"
 
 
 def deleteGenre(id):
@@ -786,15 +735,10 @@ def deleteGenre(id):
     )
     used_by_student = mycursor.fetchone()["nb"]
     if used_by_film > 0 or used_by_student > 0:
-        flash(
-            "Impossible de supprimer ce genre : il est utilisé par un film ou un étudiant.",
-            "error",
-        )
-        return redirect(url_for("admin", page=request.args.get("page", 1)))
+        return False, "Impossible de supprimer ce genre : il est utilisé par un film ou un étudiant."
     mycursor.execute("DELETE FROM GENRE WHERE id=%s", (id,))
     mydb.commit()
-    flash("Genre supprimé !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Genre supprimé !"
 
 
 def addDirector(nom):
@@ -803,15 +747,11 @@ def addDirector(nom):
         "SELECT COUNT(*) AS nb FROM REALISATEUR WHERE LOWER(nom)=LOWER(%s)",
         (nom,),
     )
-    result = mycursor.fetchone()
-    if result["nb"] > 0:
-        flash("Ce réalisateur existe déjà !", "error")
-        return redirect(url_for("admin", action="add_director", page=request.args.get("page", 1)))
-
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Ce réalisateur existe déjà !"
     mycursor.execute("INSERT INTO REALISATEUR (nom) VALUES (%s)", (nom,))
     mydb.commit()
-    flash("Réalisateur ajouté !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Réalisateur ajouté !"
 
 
 def editDirector(id, nom):
@@ -819,14 +759,11 @@ def editDirector(id, nom):
         "SELECT COUNT(*) AS nb FROM REALISATEUR WHERE LOWER(nom)=LOWER(%s) AND id!=%s",
         (nom, id),
     )
-    result = mycursor.fetchone()
-    if result["nb"] > 0:
-        flash("Ce réalisateur existe déjà !", "error")
-        return redirect(url_for("admin", action="edit_director", id=id, page=request.args.get("page", 1)))
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Ce réalisateur existe déjà !"
     mycursor.execute("UPDATE REALISATEUR SET nom=%s WHERE id=%s", (nom, id))
     mydb.commit()
-    flash("Réalisateur modifié !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Réalisateur modifié !"
 
 
 def deleteDirector(id):
@@ -834,17 +771,11 @@ def deleteDirector(id):
     mycursor.execute(
         "SELECT COUNT(*) AS nb FROM DIRECTION WHERE id_realisateur=%s", (id,)
     )
-    used_by_film = mycursor.fetchone()["nb"]
-    if used_by_film > 0:
-        flash(
-            "Impossible de supprimer ce réalisateur : il est utilisé par un film.",
-            "error",
-        )
-        return redirect(url_for("admin", page=request.args.get("page", 1)))
+    if mycursor.fetchone()["nb"] > 0:
+        return False, "Impossible de supprimer ce réalisateur : il est utilisé par un film."
     mycursor.execute("DELETE FROM REALISATEUR WHERE id=%s", (id,))
     mydb.commit()
-    flash("Réalisateur supprimé !")
-    return redirect(url_for("admin", page=request.args.get("page", 1)))
+    return True, "Réalisateur supprimé !"
 
 
 def getStudentByIdFull(id):

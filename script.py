@@ -53,7 +53,7 @@ from modele_online import (
     getTotalGenreRanking,
 )
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
 app = Flask(__name__)
 
@@ -312,7 +312,12 @@ def admin():
             password = request.form["password"]
             confirm_password = request.form["confirm_password"]
             id_etudiant = request.form.get("id_etudiant") or None
-            addUser(username, password, confirm_password, id_etudiant)
+            success, msg = addUser(username, password, confirm_password, id_etudiant)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="add_user", page=request.args.get("page", 1)))
 
         # Modifier un utilisateur
         if form_type == "edit_user":
@@ -321,12 +326,22 @@ def admin():
             password = request.form["password"]  # Peut être vide si pas de changement
             confirm_password = request.form["confirm_password"]
             id_etudiant = request.form.get("id_etudiant") or None
-            editUser(id, username, password, confirm_password, id_etudiant)
+            success, msg = editUser(id, username, password, confirm_password, id_etudiant)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="edit_user", page=request.args.get("page", 1)))
 
         # Supprimer un utilisateur
         if form_type == "delete_user":
             id = request.form["id"]
-            deleteUser(id)
+            success, msg = deleteUser(id)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="delete_user", page=request.args.get("page", 1)))
 
         # Ajouter un étudiant
         if form_type == "add_student":
@@ -334,7 +349,12 @@ def admin():
             nom = request.form["nom"]
             id_film = request.form["id_film"]
             id_genre = request.form["id_genre"]
-            addStudent(prenom, nom, id_film, id_genre)
+            success, msg = addStudent(prenom, nom, id_film, id_genre)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="add_student", page=request.args.get("page", 1)))
 
         # Modifier un étudiant
         if form_type == "edit_student":
@@ -343,18 +363,35 @@ def admin():
             nom = request.form["nom"]
             id_film = request.form["id_film"]
             id_genre = request.form["id_genre"]
-            editStudent(id, prenom, nom, id_film, id_genre)
+            success, msg = editStudent(id, prenom, nom, id_film, id_genre)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="edit_student", page=request.args.get("page", 1)))
 
         # Supprimer un étudiant
         if form_type == "delete_student":
             id = request.form["id"]
-            deleteStudent(id)
+            success, msg = deleteStudent(id)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="delete_student", page=request.args.get("page", 1)))
 
         # Ajouter un film
         if form_type == "add_film":
             nom = request.form["nom"]
             annee = request.form["annee"]
-            addFilm(nom, annee)
+            genres_ids = request.form.getlist("genres")
+            directors_ids = request.form.getlist("directors")
+            success, msg = addFilm(nom, annee, genres_ids, directors_ids)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="add_film", page=request.args.get("page", 1)))
 
         # Modifier un film
         if form_type == "edit_film":
@@ -363,56 +400,114 @@ def admin():
             annee = request.form["annee"]
             genres_ids = request.form.getlist("genres")
             directors_ids = request.form.getlist("directors")
-            editFilm(id, nom, annee, genres_ids, directors_ids)
+            success, msg = editFilm(id, nom, annee, genres_ids, directors_ids)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="edit_film", page=request.args.get("page", 1)))
 
         # Supprimer un film
         if form_type == "delete_film":
             id = request.form["id"]
-            deleteFilm(id)
+            success, msg = deleteFilm(id)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="delete_film", page=request.args.get("page", 1)))
 
         # Ajouter un genre
         if form_type == "add_genre":
             nom = request.form["nom"]
-            addGenre(nom)
+            success, msg = addGenre(nom)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="add_genre", page=request.args.get("page", 1)))
 
         # Modifier un genre
         if form_type == "edit_genre":
             id = request.form["id"]
             nom = request.form["nom"]
-            editGenre(id, nom)
+            success, msg = editGenre(id, nom)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="edit_genre", page=request.args.get("page", 1)))
 
         # Supprimer un genre
         if form_type == "delete_genre":
             id = request.form["id"]
-            deleteGenre(id)
+            success, msg = deleteGenre(id)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="delete_genre", page=request.args.get("page", 1)))
 
         # Ajouter un réalisateur
         if form_type == "add_director":
             nom = request.form["nom"]
-            addDirector(nom)
+            success, msg = addDirector(nom)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="add_director", page=request.args.get("page", 1)))
 
         # Modifier un réalisateur
         if form_type == "edit_director":
             id = request.form["id"]
             nom = request.form["nom"]
-            editDirector(id, nom)
+            success, msg = editDirector(id, nom)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="edit_director", page=request.args.get("page", 1)))
 
         # Supprimer un réalisateur
         if form_type == "delete_director":
             id = request.form["id"]
-            deleteDirector(id)
+            success, msg = deleteDirector(id)
+            flash(msg, "success" if success else "error")
+            if success:
+                return redirect(url_for("admin", page=request.args.get("page", 1)))
+            else:
+                return redirect(url_for("admin", action="delete_director", page=request.args.get("page", 1)))
+
+    # Pour modification/suppression d'un utilisateur
+    if action in ["edit_user", "delete_user"] and edit_id:
+        edit_user = getUserById(edit_id)
+    else: 
+        edit_user = None
 
     # Pour modification/suppression d'un étudiant
-    edit_student = getStudentByIdFull(edit_id) if action in ["edit_student", "delete_student"] and edit_id else None
+    if action in ["edit_student", "delete_student"] and edit_id:
+        edit_student = getStudentByIdFull(edit_id)
+    else: 
+        edit_student = None
 
     # Pour modification/suppression d'un film
-    edit_film = getFilmByIdWithLinks(edit_id) if action in ["edit_film", "delete_film"] and edit_id else None
+    if action in ["edit_film", "delete_film"] and edit_id:
+        edit_film = getFilmByIdWithLinks(edit_id) 
+    else:
+        edit_film = None
 
     # Pour modification/suppression d'un genre
-    edit_genre = getGenreById(edit_id) if action in ["edit_genre", "delete_genre"] and edit_id else None
+    if action in ["edit_genre", "delete_genre"] and edit_id:
+        edit_genre = getGenreById(edit_id)
+    else:
+        edit_genre = None
 
     # Pour modification/suppression d'un réalisateur
-    edit_director = getDirectorById(edit_id) if action in ["edit_director", "delete_director"] and edit_id else None
+    if action in ["edit_director", "delete_director"] and edit_id:
+        edit_director = getDirectorById(edit_id) 
+    else: 
+        edit_director = None
     
     # Pagination
     page = request.args.get("page", 1, type=int)
@@ -424,7 +519,6 @@ def admin():
 
     # Pour les formulaires
     users = getAllUsers()
-    edit_user = getUserById(edit_id) if action in ["edit_user", "delete_user"] and edit_id else None
     films = getAllFilms()
     genres = getAllGenres()
     directors = getAllDirectors()
