@@ -58,7 +58,7 @@ endblock %} {%block content %}
   </p>
 </section>
 <script>
-  fetch('/api/user-count')
+  fetch('/user-count')
     .then(response => response.json())
     .then(data => {
       const count = data.total_users.total;

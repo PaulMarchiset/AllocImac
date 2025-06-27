@@ -5,7 +5,7 @@
 
 import mysql.connector
 
-from modele import (
+from modele_online import (
     getAllStudents,
     getStudentById,
     userCount,
@@ -194,7 +194,7 @@ def search():
     )
 
 # Afficher le nombre total d'utilisateurs en JSON
-@app.route("/api/user-count")
+@app.route("/user-count")
 def userCount_api():
     total = userCount()
     return jsonify({"total_users": total})
